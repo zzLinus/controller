@@ -152,6 +152,7 @@ C_SOURCES += $(wildcard components/support/*.c)
 ASM_SOURCES =  \
 startup_stm32f407xx.s
 
+WORK_DIR  = $(shell pwd)
 
 #######################################
 # binaries
@@ -242,12 +243,12 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 # LDFLAGS
 #######################################
 # link script
-LDSCRIPT = STM32F407IGHx_FLASH.ld
+LDSCRIPT = STM32F407IGHX_FLASH.ld
 
 # libraries
 LIBS = -lc -lm -lnosys
 LIBDIR = 
-LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) -L/home/zzlinus/Dev/GKD/rm2023-infantry/components/algorithm -lahrs $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
+LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) -L$(WORK_DIR)/components/algorithm -lahrs $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 
 # default action: build all
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
