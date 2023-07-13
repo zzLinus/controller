@@ -2,7 +2,7 @@
 #define SERVO_TASK_H
 #include "struct_typedef.h"
 
-//¸Ç°å¿ØÖÆÍ¨µÀ£¨Ò£¿ØÆ÷×óÉÏ¹öÂÖ£©
+//ç›–æ¿æ§åˆ¶é€šé“ï¼ˆé¥æ§å™¨å·¦ä¸Šæ»šè½®ï¼‰
 #define COVER_PLATE_CHANNEL 4
 
 extern void servo_task(void const * argument);

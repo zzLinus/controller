@@ -46,6 +46,8 @@ STM32CubeF4 Firmware Package V1.26.0
   ```
   make -j
   ```
+- 7.14 by Rhine
+  - 将编码全部改为UTF-8，解决中文乱码问题
 
 ## 笔记
 ### gimbal_task 云台控制任务

@@ -1,8 +1,8 @@
 /**
   ****************************(C) COPYRIGHT 2019 DJI****************************
   * @file       oled_task.c/h
-  * @brief      OLED show error value.oledÆÁÄ»ÏÔÊ¾´íÎóÂë
-  * @note       
+  * @brief      OLED show error value.oledå±å¹•æ˜¾ç¤ºé”™è¯¯ç 
+  * @note
   * @history
   *  Version    Date            Author          Modification
   *  V1.0.0     Nov-11-2019     RM              1. done
@@ -40,11 +40,11 @@ static uint8_t refresh_tick = 0;
   * @retval         none
   */
 /**
-  * @brief          oledÈÎÎñ
+  * @brief          oledä»»åŠ¡
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
-void oled_task(void const * argument)  // !!!!!¸ÃÈÎÎñÒÑ¹Ø±Õ!!!!!
+void oled_task(void const * argument)  // !!!!!è¯¥ä»»åŠ¡å·²å…³é—­!!!!!
 {
     uint8_t i;
     uint8_t show_col, show_row;
@@ -61,9 +61,9 @@ void oled_task(void const * argument)  // !!!!!¸ÃÈÎÎñÒÑ¹Ø±Õ!!!!!
         }
         osDelay(10);
     }
-		
-		vTaskDelete(NULL);  // É¾³ıÈÎÎñ
-		
+
+    vTaskDelete(NULL);  // åˆ é™¤ä»»åŠ¡
+
     while(1)
     {
         //use i2c ack to check the oled

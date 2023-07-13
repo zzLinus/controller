@@ -1,11 +1,11 @@
 /**
   ****************************(C) COPYRIGHT 2019 DJI****************************
   * @file       shoot.c/h
-  * @brief      Éä»÷¹¦ÄÜ.
-  * @note       
+  * @brief      å°„å‡»åŠŸèƒ½.
+  * @note
   * @history
   *  Version    Date            Author          Modification
-  *  V1.0.0     Dec-26-2018     RM              1. Íê³É
+  *  V1.0.0     Dec-26-2018     RM              1. å®Œæˆ
   *
   @verbatim
   ==============================================================================
@@ -32,73 +32,73 @@
 #include "pid.h"
 #include "UI.h"
 
-#define shoot_fric1_on(pwm) fric1_on((pwm)) //Ä¦²ÁÂÖ1pwmºê¶¨Òå
-#define shoot_fric2_on(pwm) fric2_on((pwm)) //Ä¦²ÁÂÖ2pwmºê¶¨Òå
-#define shoot_fric_off()    fric_off()      //¹Ø±ÕÁ½¸öÄ¦²ÁÂÖ
+#define shoot_fric1_on(pwm) fric1_on((pwm)) //æ‘©æ“¦è½®1pwmå®å®šä¹‰
+#define shoot_fric2_on(pwm) fric2_on((pwm)) //æ‘©æ“¦è½®2pwmå®å®šä¹‰
+#define shoot_fric_off()    fric_off()      //å…³é—­ä¸¤ä¸ªæ‘©æ“¦è½®
 
-#define shoot_laser_on()    laser_on()      //¼¤¹â¿ªÆôºê¶¨Òå
-#define shoot_laser_off()   laser_off()     //¼¤¹â¹Ø±Õºê¶¨Òå
-//Î¢¶¯¿ª¹ØIO
+#define shoot_laser_on()    laser_on()      //æ¿€å…‰å¼€å¯å®å®šä¹‰
+#define shoot_laser_off()   laser_off()     //æ¿€å…‰å…³é—­å®å®šä¹‰
+//å¾®åŠ¨å¼€å…³IO
 #define BUTTEN_TRIG_PIN HAL_GPIO_ReadPin(BUTTON_TRIG_GPIO_Port, BUTTON_TRIG_Pin)
 
 
 
 
 /**
-  * @brief          Éä»÷×´Ì¬»úÉèÖÃ£¬Ò£¿ØÆ÷ÉÏ²¦Ò»´Î¿ªÆô£¬ÔÙÉÏ²¦¹Ø±Õ£¬ÏÂ²¦1´Î·¢Éä1¿Å£¬Ò»Ö±´¦ÔÚÏÂ£¬Ôò³ÖĞø·¢Éä£¬ÓÃÓÚ3min×¼±¸Ê±¼äÇåÀí×Óµ¯
+  * @brief          å°„å‡»çŠ¶æ€æœºè®¾ç½®ï¼Œé¥æ§å™¨ä¸Šæ‹¨ä¸€æ¬¡å¼€å¯ï¼Œå†ä¸Šæ‹¨å…³é—­ï¼Œä¸‹æ‹¨1æ¬¡å‘å°„1é¢—ï¼Œä¸€ç›´å¤„åœ¨ä¸‹ï¼Œåˆ™æŒç»­å‘å°„ï¼Œç”¨äº3minå‡†å¤‡æ—¶é—´æ¸…ç†å­å¼¹
   * @param[in]      void
   * @retval         void
   */
 static void shoot_set_mode(void);
 /**
-  * @brief          Éä»÷Êı¾İ¸üĞÂ
+  * @brief          å°„å‡»æ•°æ®æ›´æ–°
   * @param[in]      void
   * @retval         void
   */
 static void shoot_feedback_update(void);
 
 /**
-  * @brief          ¶Â×ªµ¹×ª´¦Àí
+  * @brief          å µè½¬å€’è½¬å¤„ç†
   * @param[in]      void
   * @retval         void
   */
 static void trigger_motor_turn_back(void);
 
 /**
-  * @brief          Éä»÷¿ØÖÆ£¬¿ØÖÆ²¦µ¯µç»ú½Ç¶È£¬Íê³ÉÒ»´Î·¢Éä
+  * @brief          å°„å‡»æ§åˆ¶ï¼Œæ§åˆ¶æ‹¨å¼¹ç”µæœºè§’åº¦ï¼Œå®Œæˆä¸€æ¬¡å‘å°„
   * @param[in]      void
   * @retval         void
   */
 static void shoot_bullet_control(void);
 
 /**
-  * @brief          ³õÊ¼»¯"gimbal_CV"±äÁ¿
-  * @param[out]     init: ĞÂÔöÁËinit_CV
+  * @brief          åˆå§‹åŒ–"gimbal_CV"å˜é‡
+  * @param[out]     init: æ–°å¢äº†init_CV
   * @retval         none
   */
 static void CV_init(shoot_control_t *init);
 
 
-shoot_control_t shoot_control;          //Éä»÷Êı¾İ
+shoot_control_t shoot_control;          //å°„å‡»æ•°æ®
 
 
 /**
-  * @brief          Éä»÷³õÊ¼»¯£¬³õÊ¼»¯PID£¬Ò£¿ØÆ÷Ö¸Õë£¬µç»úÖ¸Õë
+  * @brief          å°„å‡»åˆå§‹åŒ–ï¼Œåˆå§‹åŒ–PIDï¼Œé¥æ§å™¨æŒ‡é’ˆï¼Œç”µæœºæŒ‡é’ˆ
   * @param[in]      void
-  * @retval         ·µ»Ø¿Õ
+  * @retval         è¿”å›ç©º
   */
 void shoot_init(void)
 {
 
     static const fp32 Trigger_speed_pid[3] = {TRIGGER_ANGLE_PID_KP, TRIGGER_ANGLE_PID_KI, TRIGGER_ANGLE_PID_KD};
     shoot_control.shoot_mode = SHOOT_STOP;
-    //Ò£¿ØÆ÷Ö¸Õë
+    //é¥æ§å™¨æŒ‡é’ˆ
     shoot_control.shoot_rc = get_remote_control_point();
-    //µç»úÖ¸Õë
+    //ç”µæœºæŒ‡é’ˆ
     shoot_control.shoot_motor_measure = get_trigger_motor_measure_point();
-    //³õÊ¼»¯PID
+    //åˆå§‹åŒ–PID
     PID_init(&shoot_control.trigger_motor_pid, PID_POSITION, Trigger_speed_pid, TRIGGER_READY_PID_MAX_OUT, TRIGGER_READY_PID_MAX_IOUT);
-    //¸üĞÂÊı¾İ
+    //æ›´æ–°æ•°æ®
     shoot_feedback_update();
     ramp_init(&shoot_control.fric1_ramp, SHOOT_CONTROL_TIME * 0.001f, FRIC_DOWN, FRIC_OFF);
     ramp_init(&shoot_control.fric2_ramp, SHOOT_CONTROL_TIME * 0.001f, FRIC_DOWN, FRIC_OFF);
@@ -112,82 +112,82 @@ void shoot_init(void)
     shoot_control.speed = 0.0f;
     shoot_control.speed_set = 0.0f;
     shoot_control.key_time = 0;
-		
-		CV_init(&shoot_control);
+
+    CV_init(&shoot_control);
 }
 
 /**
-  * @brief          Éä»÷Ñ­»·
+  * @brief          å°„å‡»å¾ªç¯
   * @param[in]      void
-  * @retval         ·µ»Øcan¿ØÖÆÖµ
+  * @retval         è¿”å›canæ§åˆ¶å€¼
   */
 int16_t shoot_control_loop(gimbal_control_t *gimbal_shoot)
 {
-		//×´Ì¬»úº¯ÊıÓÃÓÚÅĞ¶Ï²¢¸üĞÂ×´Ì¬£¬shoot_control_loopÓÃÓÚ¸ù¾İ×´Ì¬½øĞĞ¿ØÖÆ²Ù×÷
-    shoot_set_mode();        //ÉèÖÃ×´Ì¬»ú
-    shoot_feedback_update(); //¸üĞÂÊı¾İ
+    //çŠ¶æ€æœºå‡½æ•°ç”¨äºåˆ¤æ–­å¹¶æ›´æ–°çŠ¶æ€ï¼Œshoot_control_loopç”¨äºæ ¹æ®çŠ¶æ€è¿›è¡Œæ§åˆ¶æ“ä½œ
+    shoot_set_mode();        //è®¾ç½®çŠ¶æ€æœº
+    shoot_feedback_update(); //æ›´æ–°æ•°æ®
 
 
     if (shoot_control.shoot_mode == SHOOT_STOP)
     {
-        //ÉèÖÃ²¦µ¯ÂÖµÄËÙ¶È
+        //è®¾ç½®æ‹¨å¼¹è½®çš„é€Ÿåº¦
         shoot_control.speed_set = 0.0f;
     }
     else if (shoot_control.shoot_mode == SHOOT_READY_FRIC)
     {
-        //ÉèÖÃ²¦µ¯ÂÖµÄËÙ¶È
+        //è®¾ç½®æ‹¨å¼¹è½®çš„é€Ÿåº¦
         shoot_control.speed_set = 0.0f;
     }
-    else if(shoot_control.shoot_mode ==SHOOT_READY_BULLET)	// ×´Ì¬<¿ªÊ¼ËÍµ¯> (¹Ù²½Âß¼­)
+    else if(shoot_control.shoot_mode ==SHOOT_READY_BULLET)	// çŠ¶æ€<å¼€å§‹é€å¼¹> (å®˜æ­¥é€»è¾‘)
     {
-				/* ¹Ù·½ */
-//        if(shoot_control.key == SWITCH_TRIGGER_OFF)  // ¼ÌĞøËÍµ¯
+        /* å®˜æ–¹ */
+//        if(shoot_control.key == SWITCH_TRIGGER_OFF)  // ç»§ç»­é€å¼¹
 //        {
-//            //ÉèÖÃ²¦µ¯ÂÖµÄ²¦¶¯ËÙ¶È,²¢¿ªÆô¶Â×ª·´×ª´¦Àí
+//            //è®¾ç½®æ‹¨å¼¹è½®çš„æ‹¨åŠ¨é€Ÿåº¦,å¹¶å¼€å¯å µè½¬åè½¬å¤„ç†
 //            shoot_control.trigger_speed_set = READY_TRIGGER_SPEED;
 //            trigger_motor_turn_back();
 //        }
-//        else																				// Í£Ö¹ËÍµ¯
+//        else																				// åœæ­¢é€å¼¹
 //        {
 //            shoot_control.trigger_speed_set = 0.0f;
 //            shoot_control.speed_set = 0.0f;
 //        }
 //        shoot_control.trigger_motor_pid.max_out = TRIGGER_READY_PID_MAX_OUT;
 //        shoot_control.trigger_motor_pid.max_iout = TRIGGER_READY_PID_MAX_IOUT;
-				/* ĞŞ¸Ä */
-				// Õâ¸öÅĞ¶ÏÌåÖ»»á½øÈëÒ»´Î£¬Ö®ºó¾Í½øÈëSHOOT_READY
-				shoot_control.trigger_speed_set = 0.0f;
-				shoot_control.speed_set = 0.0f;	
+        /* ä¿®æ”¹ */
+        // è¿™ä¸ªåˆ¤æ–­ä½“åªä¼šè¿›å…¥ä¸€æ¬¡ï¼Œä¹‹åå°±è¿›å…¥SHOOT_READY
+        shoot_control.trigger_speed_set = 0.0f;
+        shoot_control.speed_set = 0.0f;
         shoot_control.trigger_motor_pid.max_out = TRIGGER_READY_PID_MAX_OUT;
         shoot_control.trigger_motor_pid.max_iout = TRIGGER_READY_PID_MAX_IOUT;
-				shoot_control.shoot_mode = SHOOT_READY;
+        shoot_control.shoot_mode = SHOOT_READY;
     }
-    else if (shoot_control.shoot_mode == SHOOT_READY)  // ×´Ì¬<¿ÉÒÔÉä»÷>
-    {		//µÈ´ı½øÈëSHOOT_BULLET×´Ì¬µÄÖ¸Áî
-        //ÉèÖÃ²¦µ¯ÂÖµÄËÙ¶È
-         shoot_control.speed_set = 0.0f;
+    else if (shoot_control.shoot_mode == SHOOT_READY)  // çŠ¶æ€<å¯ä»¥å°„å‡»>
+    {		//ç­‰å¾…è¿›å…¥SHOOT_BULLETçŠ¶æ€çš„æŒ‡ä»¤
+        //è®¾ç½®æ‹¨å¼¹è½®çš„é€Ÿåº¦
+        shoot_control.speed_set = 0.0f;
     }
-    else if (shoot_control.shoot_mode == SHOOT_BULLET)  // ×´Ì¬<¿ªÊ¼Éä»÷-µãÉä>
+    else if (shoot_control.shoot_mode == SHOOT_BULLET)  // çŠ¶æ€<å¼€å§‹å°„å‡»-ç‚¹å°„>
     {
-				/* ¹Ù·½ */
+        /* å®˜æ–¹ */
         shoot_control.trigger_motor_pid.max_out = TRIGGER_BULLET_PID_MAX_OUT;
         shoot_control.trigger_motor_pid.max_iout = TRIGGER_BULLET_PID_MAX_IOUT;
         shoot_bullet_control();
-				/* ĞŞ¸Ä */
+        /* ä¿®æ”¹ */
 //				static uint16_t i=0;
 //        shoot_control.trigger_motor_pid.max_out = TRIGGER_BULLET_PID_MAX_OUT;
 //        shoot_control.trigger_motor_pid.max_iout = TRIGGER_BULLET_PID_MAX_IOUT;
 //				shoot_control.trigger_speed_set = TRIGGER_SPEED;
 //        trigger_motor_turn_back();
-//				if(++i > TRIGGER_LONG_TIME)  //µ¥´ÎµãÉä²¦µ¯µç»ú³ÖĞøÊ±¼ä
+//				if(++i > TRIGGER_LONG_TIME)  //å•æ¬¡ç‚¹å°„æ‹¨å¼¹ç”µæœºæŒç»­æ—¶é—´
 //				{
 //						i = 0;
 //						shoot_control.shoot_mode = SHOOT_DONE;
 //				}
     }
-    else if (shoot_control.shoot_mode == SHOOT_CONTINUE_BULLET)  // ×´Ì¬<¿ªÊ¼Éä»÷-Á¬Éä>
+    else if (shoot_control.shoot_mode == SHOOT_CONTINUE_BULLET)  // çŠ¶æ€<å¼€å§‹å°„å‡»-è¿å°„>
     {
-        //ÉèÖÃ²¦µ¯ÂÖµÄ²¦¶¯ËÙ¶È,²¢¿ªÆô¶Â×ª·´×ª´¦Àí
+        //è®¾ç½®æ‹¨å¼¹è½®çš„æ‹¨åŠ¨é€Ÿåº¦,å¹¶å¼€å¯å µè½¬åè½¬å¤„ç†
         shoot_control.trigger_speed_set = CONTINUE_TRIGGER_SPEED;
         trigger_motor_turn_back();
     }
@@ -200,21 +200,21 @@ int16_t shoot_control_loop(gimbal_control_t *gimbal_shoot)
     {
         shoot_laser_off();
         shoot_control.given_current = 0;
-        //Ä¦²ÁÂÖĞèÒªÒ»¸ö¸öĞ±²¨¿ªÆô£¬²»ÄÜÍ¬Ê±Ö±½Ó¿ªÆô£¬·ñÔò¿ÉÄÜµç»ú²»×ª
+        //æ‘©æ“¦è½®éœ€è¦ä¸€ä¸ªä¸ªæ–œæ³¢å¼€å¯ï¼Œä¸èƒ½åŒæ—¶ç›´æ¥å¼€å¯ï¼Œå¦åˆ™å¯èƒ½ç”µæœºä¸è½¬
         ramp_calc(&shoot_control.fric1_ramp, -SHOOT_FRIC_PWM_ADD_VALUE);
         ramp_calc(&shoot_control.fric2_ramp, -SHOOT_FRIC_PWM_ADD_VALUE);
     }
     else
     {
-        shoot_laser_on(); //¼¤¹â¿ªÆô
-        //¼ÆËã²¦µ¯ÂÖµç»úPID
+        shoot_laser_on(); //æ¿€å…‰å¼€å¯
+        //è®¡ç®—æ‹¨å¼¹è½®ç”µæœºPID
         PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
         shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
         if(shoot_control.shoot_mode < SHOOT_READY_BULLET)
         {
             shoot_control.given_current = 0;
         }
-        //Ä¦²ÁÂÖĞèÒªÒ»¸ö¸öĞ±²¨¿ªÆô£¬²»ÄÜÍ¬Ê±Ö±½Ó¿ªÆô£¬·ñÔò¿ÉÄÜµç»ú²»×ª
+        //æ‘©æ“¦è½®éœ€è¦ä¸€ä¸ªä¸ªæ–œæ³¢å¼€å¯ï¼Œä¸èƒ½åŒæ—¶ç›´æ¥å¼€å¯ï¼Œå¦åˆ™å¯èƒ½ç”µæœºä¸è½¬
         ramp_calc(&shoot_control.fric1_ramp, SHOOT_FRIC_PWM_ADD_VALUE);
         ramp_calc(&shoot_control.fric2_ramp, SHOOT_FRIC_PWM_ADD_VALUE);
 
@@ -222,97 +222,97 @@ int16_t shoot_control_loop(gimbal_control_t *gimbal_shoot)
 
     shoot_control.fric_pwm1 = (uint16_t)(shoot_control.fric1_ramp.out);
     shoot_control.fric_pwm2 = (uint16_t)(shoot_control.fric2_ramp.out);
-		/* ²¿·ÖÑØÓÃÁËÔ­ÓĞµÄÄ¦²ÁÂÖËÙ¶È¿ØÖÆÂß¼­£¬¸ü¸ÄÁËÊä³ö²¿·Ö£¬´Ë´¦Ö»¼ÆËãµçÁ÷£¬Ö÷Ñ­»·ÀïÊä³öµçÁ÷ */
+    /* éƒ¨åˆ†æ²¿ç”¨äº†åŸæœ‰çš„æ‘©æ“¦è½®é€Ÿåº¦æ§åˆ¶é€»è¾‘ï¼Œæ›´æ”¹äº†è¾“å‡ºéƒ¨åˆ†ï¼Œæ­¤å¤„åªè®¡ç®—ç”µæµï¼Œä¸»å¾ªç¯é‡Œè¾“å‡ºç”µæµ */
 //    shoot_fric1_on(shoot_control.fric_pwm1);
 //    shoot_fric2_on(shoot_control.fric_pwm2);
-		gimbal_shoot->fric1_motor.speed_set = -shoot_control.fric_pwm1;
-		gimbal_shoot->fric2_motor.speed_set = shoot_control.fric_pwm2;
-		PID_calc(&gimbal_shoot->fric1_motor_pid, gimbal_shoot->fric1_motor.speed, gimbal_shoot->fric1_motor.speed_set);
-		gimbal_shoot->fric1_motor.give_current = (int16_t)(gimbal_shoot->fric1_motor_pid.out);
-		PID_calc(&gimbal_shoot->fric2_motor_pid, gimbal_shoot->fric2_motor.speed, gimbal_shoot->fric2_motor.speed_set);
-		gimbal_shoot->fric2_motor.give_current = (int16_t)(gimbal_shoot->fric2_motor_pid.out);
+    gimbal_shoot->fric1_motor.speed_set = -shoot_control.fric_pwm1;
+    gimbal_shoot->fric2_motor.speed_set = shoot_control.fric_pwm2;
+    PID_calc(&gimbal_shoot->fric1_motor_pid, gimbal_shoot->fric1_motor.speed, gimbal_shoot->fric1_motor.speed_set);
+    gimbal_shoot->fric1_motor.give_current = (int16_t)(gimbal_shoot->fric1_motor_pid.out);
+    PID_calc(&gimbal_shoot->fric2_motor_pid, gimbal_shoot->fric2_motor.speed, gimbal_shoot->fric2_motor.speed_set);
+    gimbal_shoot->fric2_motor.give_current = (int16_t)(gimbal_shoot->fric2_motor_pid.out);
     return shoot_control.given_current;
 }
 
 /**
-  * @brief          Éä»÷×´Ì¬»úÉèÖÃ£¬Ò£¿ØÆ÷ÉÏ²¦Ò»´Î¿ªÆô£¬ÔÙÉÏ²¦¹Ø±Õ£¬ÏÂ²¦1´Î·¢Éä1¿Å£¬Ò»Ö±´¦ÔÚÏÂ£¬Ôò³ÖĞø·¢Éä£¬ÓÃÓÚ3min×¼±¸Ê±¼äÇåÀí×Óµ¯
+  * @brief          å°„å‡»çŠ¶æ€æœºè®¾ç½®ï¼Œé¥æ§å™¨ä¸Šæ‹¨ä¸€æ¬¡å¼€å¯ï¼Œå†ä¸Šæ‹¨å…³é—­ï¼Œä¸‹æ‹¨1æ¬¡å‘å°„1é¢—ï¼Œä¸€ç›´å¤„åœ¨ä¸‹ï¼Œåˆ™æŒç»­å‘å°„ï¼Œç”¨äº3minå‡†å¤‡æ—¶é—´æ¸…ç†å­å¼¹
   * @param[in]      void
   * @retval         void
   */
 static void shoot_set_mode(void)
 {
     static int8_t last_s = RC_SW_UP;
-	  static int16_t last_key_mode = 0;
+    static int16_t last_key_mode = 0;
 
-    //ÉÏ²¦ÅĞ¶Ï£¬ Ò»´Î¿ªÆô£¬ÔÙ´Î¹Ø±Õ
+    //ä¸Šæ‹¨åˆ¤æ–­ï¼Œ ä¸€æ¬¡å¼€å¯ï¼Œå†æ¬¡å…³é—­
     if ((switch_is_up(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_up(last_s) && shoot_control.shoot_mode == SHOOT_STOP))
     {
-        shoot_control.shoot_mode = SHOOT_READY_FRIC;  // ×´Ì¬<Ä¦²ÁÂÖ¿ªÆô>
+        shoot_control.shoot_mode = SHOOT_READY_FRIC;  // çŠ¶æ€<æ‘©æ“¦è½®å¼€å¯>
     }
     else if ((switch_is_up(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_up(last_s) && shoot_control.shoot_mode != SHOOT_STOP))
     {
-        shoot_control.shoot_mode = SHOOT_STOP;  // ×´Ì¬<Ä¦²ÁÂÖÍ£Ö¹>
+        shoot_control.shoot_mode = SHOOT_STOP;  // çŠ¶æ€<æ‘©æ“¦è½®åœæ­¢>
     }
-		
-		if ((shoot_control.shoot_rc->key.v & FRIC_MODE_SWITCH_KEYBOARD) && last_key_mode == 0)
+
+    if ((shoot_control.shoot_rc->key.v & FRIC_MODE_SWITCH_KEYBOARD) && last_key_mode == 0)
     {
-				if(shoot_control.shoot_mode == SHOOT_STOP)
-				{
-					  shoot_control.shoot_mode = SHOOT_READY_FRIC;
-				}
-				else if(shoot_control.shoot_mode != SHOOT_STOP)
-				{
-						shoot_control.shoot_mode = SHOOT_STOP;
-				}
+        if(shoot_control.shoot_mode == SHOOT_STOP)
+        {
+            shoot_control.shoot_mode = SHOOT_READY_FRIC;
+        }
+        else if(shoot_control.shoot_mode != SHOOT_STOP)
+        {
+            shoot_control.shoot_mode = SHOOT_STOP;
+        }
     }
-		UI_set_fric(shoot_control.shoot_mode != SHOOT_STOP);
-		last_key_mode = (shoot_control.shoot_rc->key.v & FRIC_MODE_SWITCH_KEYBOARD);
-//    //´¦ÓÚÖĞµµ£¬ ¿ÉÒÔÊ¹ÓÃ¼üÅÌ¿ªÆôÄ¦²ÁÂÖ // Ö»ÓĞÍ¨¹ı¼üÅÌ²ÅÄÜ½øÈëÕâ¸öÅĞ¶ÏÌå
+    UI_set_fric(shoot_control.shoot_mode != SHOOT_STOP);
+    last_key_mode = (shoot_control.shoot_rc->key.v & FRIC_MODE_SWITCH_KEYBOARD);
+//    //å¤„äºä¸­æ¡£ï¼Œ å¯ä»¥ä½¿ç”¨é”®ç›˜å¼€å¯æ‘©æ“¦è½® // åªæœ‰é€šè¿‡é”®ç›˜æ‰èƒ½è¿›å…¥è¿™ä¸ªåˆ¤æ–­ä½“
 //    if (switch_is_mid(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && (shoot_control.shoot_rc->key.v & SHOOT_ON_KEYBOARD) && shoot_control.shoot_mode == SHOOT_STOP)
-//    { 	
-//        shoot_control.shoot_mode = SHOOT_READY_FRIC;  // ×´Ì¬<Ä¦²ÁÂÖ¿ªÆô>
+//    {
+//        shoot_control.shoot_mode = SHOOT_READY_FRIC;  // çŠ¶æ€<æ‘©æ“¦è½®å¼€å¯>
 //    }
-//    //´¦ÓÚÖĞµµ£¬ ¿ÉÒÔÊ¹ÓÃ¼üÅÌ¹Ø±ÕÄ¦²ÁÂÖ // Ö»ÓĞÍ¨¹ı¼üÅÌ²ÅÄÜ½øÈëÕâ¸öÅĞ¶ÏÌå
+//    //å¤„äºä¸­æ¡£ï¼Œ å¯ä»¥ä½¿ç”¨é”®ç›˜å…³é—­æ‘©æ“¦è½® // åªæœ‰é€šè¿‡é”®ç›˜æ‰èƒ½è¿›å…¥è¿™ä¸ªåˆ¤æ–­ä½“
 //    else if (switch_is_mid(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && (shoot_control.shoot_rc->key.v & SHOOT_OFF_KEYBOARD) && shoot_control.shoot_mode != SHOOT_STOP)
-//    { 	
-//        shoot_control.shoot_mode = SHOOT_STOP;  // ×´Ì¬<Ä¦²ÁÂÖÍ£Ö¹>
+//    {
+//        shoot_control.shoot_mode = SHOOT_STOP;  // çŠ¶æ€<æ‘©æ“¦è½®åœæ­¢>
 //    }
-		
-		// ÇĞ»»µãÉäºÍÁ¬Éä
-		static int16_t last_mode_key = 0;
-		static int8_t shoot_mode = 1;
-		if(!last_mode_key && (shoot_control.shoot_rc->key.v & SHOOT_MODE_SWITCH_KEYBOARD))
-		{
-			shoot_mode = !shoot_mode;
-		}
-		last_mode_key = shoot_control.shoot_rc->key.v & SHOOT_MODE_SWITCH_KEYBOARD;
-		
-		// Á½¸öÄ¦²ÁÂÖµç»úµÄ×ªËÙÒÑ´ïµ½Éè¶¨Öµ(Ä¦²ÁÂÖ×ªËÙÊÇ»ºÂıÔö¼ÓµÄ)
+
+    // åˆ‡æ¢ç‚¹å°„å’Œè¿å°„
+    static int16_t last_mode_key = 0;
+    static int8_t shoot_mode = 1;
+    if(!last_mode_key && (shoot_control.shoot_rc->key.v & SHOOT_MODE_SWITCH_KEYBOARD))
+    {
+        shoot_mode = !shoot_mode;
+    }
+    last_mode_key = shoot_control.shoot_rc->key.v & SHOOT_MODE_SWITCH_KEYBOARD;
+
+    // ä¸¤ä¸ªæ‘©æ“¦è½®ç”µæœºçš„è½¬é€Ÿå·²è¾¾åˆ°è®¾å®šå€¼(æ‘©æ“¦è½®è½¬é€Ÿæ˜¯ç¼“æ…¢å¢åŠ çš„)
     if(shoot_control.shoot_mode == SHOOT_READY_FRIC && shoot_control.fric1_ramp.out == shoot_control.fric1_ramp.max_value && shoot_control.fric2_ramp.out == shoot_control.fric2_ramp.max_value)
     {
-        shoot_control.shoot_mode = SHOOT_READY_BULLET;  // ×´Ì¬<¿ªÊ¼ËÍµ¯> (¹Ù²½¹¦ÄÜ)
+        shoot_control.shoot_mode = SHOOT_READY_BULLET;  // çŠ¶æ€<å¼€å§‹é€å¼¹> (å®˜æ­¥åŠŸèƒ½)
     }
-		// ¼ì²âËÍµ¯ÊÇ·ñÍê³É: Î¢¶¯¿ª¹ØÒÑ°´ÏÂ,ËÍµ¯Íê³É
-    else if(shoot_control.shoot_mode == SHOOT_READY_BULLET && shoot_control.key == SWITCH_TRIGGER_ON)  
+        // æ£€æµ‹é€å¼¹æ˜¯å¦å®Œæˆ: å¾®åŠ¨å¼€å…³å·²æŒ‰ä¸‹,é€å¼¹å®Œæˆ
+    else if(shoot_control.shoot_mode == SHOOT_READY_BULLET && shoot_control.key == SWITCH_TRIGGER_ON)
     {
-        shoot_control.shoot_mode = SHOOT_READY;  // ×´Ì¬<¿ÉÒÔÉä»÷> ËÍµ¯Íê³É£¬×¼±¸ºÃÉä»÷
+        shoot_control.shoot_mode = SHOOT_READY;  // çŠ¶æ€<å¯ä»¥å°„å‡»> é€å¼¹å®Œæˆï¼Œå‡†å¤‡å¥½å°„å‡»
     }
-		// ¼ì²âËÍµ¯ÊÇ·ñÍê³É: Î¢¶¯¿ª¹ØÎ´°´ÏÂ,ËÍµ¯Î´Íê³É
-    else if(shoot_control.shoot_mode == SHOOT_READY && shoot_control.key == SWITCH_TRIGGER_OFF)  
+        // æ£€æµ‹é€å¼¹æ˜¯å¦å®Œæˆ: å¾®åŠ¨å¼€å…³æœªæŒ‰ä¸‹,é€å¼¹æœªå®Œæˆ
+    else if(shoot_control.shoot_mode == SHOOT_READY && shoot_control.key == SWITCH_TRIGGER_OFF)
     {
-        shoot_control.shoot_mode = SHOOT_READY_BULLET;  // ×´Ì¬<¿ªÊ¼ËÍµ¯> (¹Ù²½¹¦ÄÜ)
+        shoot_control.shoot_mode = SHOOT_READY_BULLET;  // çŠ¶æ€<å¼€å§‹é€å¼¹> (å®˜æ­¥åŠŸèƒ½)
     }
-    else if(shoot_control.shoot_mode == SHOOT_READY)  // ×´Ì¬<¿ÉÒÔÉä»÷>
+    else if(shoot_control.shoot_mode == SHOOT_READY)  // çŠ¶æ€<å¯ä»¥å°„å‡»>
     {
-        //ÏÂ²¦Ò»´Î»òÕßÊó±ê°´ÏÂÒ»´Î£¬½øÈëÉä»÷×´Ì¬
+        //ä¸‹æ‹¨ä¸€æ¬¡æˆ–è€…é¼ æ ‡æŒ‰ä¸‹ä¸€æ¬¡ï¼Œè¿›å…¥å°„å‡»çŠ¶æ€
         if ((switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_down(last_s)) || (shoot_control.press_l && shoot_control.last_press_l == 0))
         {
-            shoot_control.shoot_mode = SHOOT_BULLET;  // ×´Ì¬<¿ªÊ¼Éä»÷>
+            shoot_control.shoot_mode = SHOOT_BULLET;  // çŠ¶æ€<å¼€å§‹å°„å‡»>
         }
     }
     else if(shoot_control.shoot_mode == SHOOT_DONE)
     {
-				/* ¹Ù·½ */
+        /* å®˜æ–¹ */
 //        if(shoot_control.key == SWITCH_TRIGGER_OFF)
 //        {
 //            shoot_control.key_time++;
@@ -327,19 +327,19 @@ static void shoot_set_mode(void)
 //            shoot_control.key_time = 0;
 //            shoot_control.shoot_mode = SHOOT_BULLET;
 //        }
-				/* ĞÂÔö */
-				shoot_control.key_time++;
-				if(shoot_control.key_time > SHOOT_DONE_KEY_OFF_TIME)
-				{
-						shoot_control.key_time = 0;
-						shoot_control.shoot_mode = SHOOT_READY_BULLET;
-				}
+        /* æ–°å¢ */
+        shoot_control.key_time++;
+        if(shoot_control.key_time > SHOOT_DONE_KEY_OFF_TIME)
+        {
+            shoot_control.key_time = 0;
+            shoot_control.shoot_mode = SHOOT_READY_BULLET;
+        }
     }
-    
-		//Èç¹û´¦ÓÚÉä»÷×´Ì¬
+
+    //å¦‚æœå¤„äºå°„å‡»çŠ¶æ€
     if(shoot_control.shoot_mode > SHOOT_READY_FRIC)  // > SHOOT_READY_FRIC: SHOOT_READY_BULLET \ SHOOT_READY \ SHOOT_BULLET \ SHOOT_CONTINUE_BULLET \ SHOOT_DONE
     {
-        //Êó±ê³¤°´Ò»Ö±½øÈëÉä»÷×´Ì¬ ±£³ÖÁ¬·¢
+        //é¼ æ ‡é•¿æŒ‰ä¸€ç›´è¿›å…¥å°„å‡»çŠ¶æ€ ä¿æŒè¿å‘
 //        if ((shoot_control.press_l_time == PRESS_LONG_TIME) || (shoot_control.press_r_time == PRESS_LONG_TIME) || (shoot_control.rc_s_time == RC_S_LONG_TIME))
 //        {
 //            shoot_control.shoot_mode = SHOOT_CONTINUE_BULLET;
@@ -348,8 +348,8 @@ static void shoot_set_mode(void)
 //        {
 //            shoot_control.shoot_mode = SHOOT_READY_BULLET;
 //        }
-				
-        /* ĞÂÔö£º°´¼üÇĞ»»Êó±êµãÉäºÍÁ¬Éä£¬Ò£¿ØÆ÷Ò»Ö±Á¬Éä */
+
+        /* æ–°å¢ï¼šæŒ‰é”®åˆ‡æ¢é¼ æ ‡ç‚¹å°„å’Œè¿å°„ï¼Œé¥æ§å™¨ä¸€ç›´è¿å°„ */
         if (switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) || (shoot_mode && shoot_control.press_l))
         {
             shoot_control.shoot_mode = SHOOT_CONTINUE_BULLET;
@@ -359,8 +359,8 @@ static void shoot_set_mode(void)
             shoot_control.shoot_mode = SHOOT_READY_BULLET;
         }
     }
-		
-		//¼ì²âÇ¹¿ÚÈÈÁ¿£¬ÈôÇ¹¿Ú¹ıÈÈ£¬ÔòÍ£Ö¹Éä»÷
+
+    //æ£€æµ‹æªå£çƒ­é‡ï¼Œè‹¥æªå£è¿‡çƒ­ï¼Œåˆ™åœæ­¢å°„å‡»
     get_shoot_heat0_limit_and_heat0(&shoot_control.heat_limit, &shoot_control.heat);
     if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE > 280))
     {
@@ -369,8 +369,8 @@ static void shoot_set_mode(void)
             shoot_control.shoot_mode =SHOOT_READY_BULLET;
         }
     }
-		
-    //Èç¹ûÔÆÌ¨×´Ì¬ÊÇ ÎŞÁ¦×´Ì¬£¬¾Í¹Ø±ÕÉä»÷
+
+    //å¦‚æœäº‘å°çŠ¶æ€æ˜¯ æ— åŠ›çŠ¶æ€ï¼Œå°±å…³é—­å°„å‡»
     if (gimbal_cmd_to_shoot_stop())
     {
         shoot_control.shoot_mode = SHOOT_STOP;
@@ -379,7 +379,7 @@ static void shoot_set_mode(void)
     last_s = shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL];
 }
 /**
-  * @brief          Éä»÷Êı¾İ¸üĞÂ
+  * @brief          å°„å‡»æ•°æ®æ›´æ–°
   * @param[in]      void
   * @retval         void
   */
@@ -390,16 +390,16 @@ static void shoot_feedback_update(void)
     static fp32 speed_fliter_2 = 0.0f;
     static fp32 speed_fliter_3 = 0.0f;
 
-    //²¦µ¯ÂÖµç»úËÙ¶ÈÂË²¨Ò»ÏÂ
+    //æ‹¨å¼¹è½®ç”µæœºé€Ÿåº¦æ»¤æ³¢ä¸€ä¸‹
     static const fp32 fliter_num[3] = {1.725709860247969f, -0.75594777109163436f, 0.030237910843665373f};
 
-    //¶ş½×µÍÍ¨ÂË²¨
+    //äºŒé˜¶ä½é€šæ»¤æ³¢
     speed_fliter_1 = speed_fliter_2;
     speed_fliter_2 = speed_fliter_3;
     speed_fliter_3 = speed_fliter_2 * fliter_num[0] + speed_fliter_1 * fliter_num[1] + (shoot_control.shoot_motor_measure->speed_rpm * MOTOR_RPM_TO_SPEED) * fliter_num[2];
     shoot_control.speed = speed_fliter_3;
 
-    //µç»úÈ¦ÊıÖØÖÃ£¬ ÒòÎªÊä³öÖáĞı×ªÒ»È¦£¬ µç»úÖáĞı×ª 36È¦£¬½«µç»úÖáÊı¾İ´¦Àí³ÉÊä³öÖáÊı¾İ£¬ÓÃÓÚ¿ØÖÆÊä³öÖá½Ç¶È
+    //ç”µæœºåœˆæ•°é‡ç½®ï¼Œ å› ä¸ºè¾“å‡ºè½´æ—‹è½¬ä¸€åœˆï¼Œ ç”µæœºè½´æ—‹è½¬ 36åœˆï¼Œå°†ç”µæœºè½´æ•°æ®å¤„ç†æˆè¾“å‡ºè½´æ•°æ®ï¼Œç”¨äºæ§åˆ¶è¾“å‡ºè½´è§’åº¦
     if (shoot_control.shoot_motor_measure->ecd - shoot_control.shoot_motor_measure->last_ecd > HALF_ECD_RANGE)
     {
         shoot_control.ecd_count--;
@@ -418,17 +418,17 @@ static void shoot_feedback_update(void)
         shoot_control.ecd_count = FULL_COUNT - 1;
     }
 
-    //¼ÆËãÊä³öÖá½Ç¶È
+    //è®¡ç®—è¾“å‡ºè½´è§’åº¦
     shoot_control.angle = (shoot_control.ecd_count * ECD_RANGE + shoot_control.shoot_motor_measure->ecd) * MOTOR_ECD_TO_ANGLE;
-    //Î¢¶¯¿ª¹Ø
+    //å¾®åŠ¨å¼€å…³
 //    shoot_control.key = BUTTEN_TRIG_PIN;
-		shoot_control.key = SWITCH_TRIGGER_ON;  // ÉèÖÃÎ¢¶¯¿ª¹ØÒ»Ö±´¦ÓÚ°´ÏÂ×´Ì¬£¬ÆÁ±ÎËÍµ¯¼ì²â
-    //Êó±ê°´¼ü
+    shoot_control.key = SWITCH_TRIGGER_ON;  // è®¾ç½®å¾®åŠ¨å¼€å…³ä¸€ç›´å¤„äºæŒ‰ä¸‹çŠ¶æ€ï¼Œå±è”½é€å¼¹æ£€æµ‹
+    //é¼ æ ‡æŒ‰é”®
     shoot_control.last_press_l = shoot_control.press_l;
     shoot_control.last_press_r = shoot_control.press_r;
     shoot_control.press_l = shoot_control.shoot_rc->mouse.press_l;
     shoot_control.press_r = shoot_control.shoot_rc->mouse.press_r;
-    //³¤°´¼ÆÊ±
+    //é•¿æŒ‰è®¡æ—¶
     if (shoot_control.press_l)
     {
         if (shoot_control.press_l_time < PRESS_LONG_TIME)
@@ -453,10 +453,10 @@ static void shoot_feedback_update(void)
         shoot_control.press_r_time = 0;
     }
 
-    //Éä»÷¿ª¹ØÏÂµµÊ±¼ä¼ÆÊ±
-		//ĞÂÔöÊÓ¾õ¿ØÖÆÉä»÷µÄÂß¼­£º¼´Ê¹ÓÃÊÓ¾õÖ¸ÁîÄ£Äâswitch down£¬´Ó¶ø´¥·¢Éä»÷
-    if (shoot_control.shoot_mode != SHOOT_STOP && 
-			 (switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) || (shoot_control.can_CV->cv_shoot_status == CV_SHOOT_START && shoot_control.can_CV->cv_reco_status == CV_RECO_START)))
+    //å°„å‡»å¼€å…³ä¸‹æ¡£æ—¶é—´è®¡æ—¶
+    //æ–°å¢è§†è§‰æ§åˆ¶å°„å‡»çš„é€»è¾‘ï¼šå³ä½¿ç”¨è§†è§‰æŒ‡ä»¤æ¨¡æ‹Ÿswitch downï¼Œä»è€Œè§¦å‘å°„å‡»
+    if (shoot_control.shoot_mode != SHOOT_STOP &&
+        (switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) || (shoot_control.can_CV->cv_shoot_status == CV_SHOOT_START && shoot_control.can_CV->cv_reco_status == CV_RECO_START)))
     {
         if (shoot_control.rc_s_time < RC_S_LONG_TIME)
         {
@@ -468,7 +468,7 @@ static void shoot_feedback_update(void)
         shoot_control.rc_s_time = 0;
     }
 
-//    //Êó±êÓÒ¼ü°´ÏÂ¼ÓËÙÄ¦²ÁÂÖ£¬Ê¹µÃ×ó¼üµÍËÙÉä»÷£¬ ÓÒ¼ü¸ßËÙÉä»÷
+//    //é¼ æ ‡å³é”®æŒ‰ä¸‹åŠ é€Ÿæ‘©æ“¦è½®ï¼Œä½¿å¾—å·¦é”®ä½é€Ÿå°„å‡»ï¼Œ å³é”®é«˜é€Ÿå°„å‡»
 //    static uint16_t up_time = 0;
 //    if (shoot_control.press_r)
 //    {
@@ -485,13 +485,13 @@ static void shoot_feedback_update(void)
 //        shoot_control.fric1_ramp.max_value = FRIC_DOWN;
 //        shoot_control.fric2_ramp.max_value = FRIC_DOWN;
 //    }
-		/* ÆÁ±ÎÊó±êÓÒ¼ü¸ßËÙÉä»÷¹¦ÄÜ */
-		shoot_control.fric1_ramp.max_value = FRIC_DOWN;
-		shoot_control.fric2_ramp.max_value = FRIC_DOWN;
+    /* å±è”½é¼ æ ‡å³é”®é«˜é€Ÿå°„å‡»åŠŸèƒ½ */
+    shoot_control.fric1_ramp.max_value = FRIC_DOWN;
+    shoot_control.fric2_ramp.max_value = FRIC_DOWN;
 
 }
 
-static void trigger_motor_turn_back(void)  // µç»úĞı×ª
+static void trigger_motor_turn_back(void)  // ç”µæœºæ—‹è½¬
 {
     if( shoot_control.block_time < BLOCK_TIME)
     {
@@ -518,45 +518,45 @@ static void trigger_motor_turn_back(void)  // µç»úĞı×ª
 }
 
 /**
-  * @brief          Éä»÷¿ØÖÆ£¬¿ØÖÆ²¦µ¯µç»ú½Ç¶È£¬Íê³ÉÒ»´Î·¢Éä (Éä³öÒ»·¢×Óµ¯)
+  * @brief          å°„å‡»æ§åˆ¶ï¼Œæ§åˆ¶æ‹¨å¼¹ç”µæœºè§’åº¦ï¼Œå®Œæˆä¸€æ¬¡å‘å°„ (å°„å‡ºä¸€å‘å­å¼¹)
   * @param[in]      void
   * @retval         void
   */
 static void shoot_bullet_control(void)
 {
-		//Ã¿´Î²¦¶¯ 1/4PIµÄ½Ç¶È
+    //æ¯æ¬¡æ‹¨åŠ¨ 1/4PIçš„è§’åº¦
     if (shoot_control.move_flag == 0)
     {
-        shoot_control.set_angle = rad_format(shoot_control.angle + PI_FOUR*0.95f);  // ÓÉPI_TEN¸ÄÎªPI_FOUR
+        shoot_control.set_angle = rad_format(shoot_control.angle + PI_FOUR*0.95f);  // ç”±PI_TENæ”¹ä¸ºPI_FOUR
         shoot_control.move_flag = 1;
     }
-//    if(shoot_control.key == SWITCH_TRIGGER_OFF)  // Î¢¶¯¿ª¹ØËÉ¿ª£ºÀíÂÛÉÏÒ»·¢µ¯Íè¾­¹ı»á·Ö±ğ°´ÏÂºÍËÉ¿ªÒ»´ÎÎ¢¶¯¿ª¹Ø (¹Ù²½Âß¼­)
+//    if(shoot_control.key == SWITCH_TRIGGER_OFF)  // å¾®åŠ¨å¼€å…³æ¾å¼€ï¼šç†è®ºä¸Šä¸€å‘å¼¹ä¸¸ç»è¿‡ä¼šåˆ†åˆ«æŒ‰ä¸‹å’Œæ¾å¼€ä¸€æ¬¡å¾®åŠ¨å¼€å…³ (å®˜æ­¥é€»è¾‘)
 //    {
 //        shoot_control.shoot_mode = SHOOT_DONE;
 //    }
-    //µ½´ï½Ç¶ÈÅĞ¶Ï
-    if (rad_format(shoot_control.set_angle - shoot_control.angle) > 0.05f)  // ËÀÇø=0.05
+    //åˆ°è¾¾è§’åº¦åˆ¤æ–­
+    if (rad_format(shoot_control.set_angle - shoot_control.angle) > 0.05f)  // æ­»åŒº=0.05
     {
-        //Éè¶¨½Ç¶ÈÃ»µ½´ï£¬Ò»Ö±Ğı×ª
-        shoot_control.trigger_speed_set = TRIGGER_SPEED;  // ÉèÖÃĞı×ªËÙ¶È
-        trigger_motor_turn_back();  // Ğı×ª
+        //è®¾å®šè§’åº¦æ²¡åˆ°è¾¾ï¼Œä¸€ç›´æ—‹è½¬
+        shoot_control.trigger_speed_set = TRIGGER_SPEED;  // è®¾ç½®æ—‹è½¬é€Ÿåº¦
+        trigger_motor_turn_back();  // æ—‹è½¬
     }
     else
     {
         shoot_control.move_flag = 0;
-				/* ĞÂÔö */
-				shoot_control.shoot_mode = SHOOT_DONE;
+        /* æ–°å¢ */
+        shoot_control.shoot_mode = SHOOT_DONE;
     }
 }
 
 /**
-  * @brief          ³õÊ¼»¯"gimbal_CV"±äÁ¿
-  * @param[out]     init: ĞÂÔöÁËinit_CV
+  * @brief          åˆå§‹åŒ–"gimbal_CV"å˜é‡
+  * @param[out]     init: æ–°å¢äº†init_CV
   * @retval         none
   */
 static void CV_init(shoot_control_t *init)
 {
-		//³õÊ¼»¯CV½á¹¹Ìå
-		init->can_CV = get_can_CV_point();
+    //åˆå§‹åŒ–CVç»“æ„ä½“
+    init->can_CV = get_can_CV_point();
 }
 

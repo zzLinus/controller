@@ -1,8 +1,8 @@
 /**
   ****************************(C) COPYRIGHT 2019 DJI****************************
   * @file       usb_task.c/h
-  * @brief      usb outputs the error message.usbÊä³ö´íÎóÐÅÏ¢
-  * @note       
+  * @brief      usb outputs the error message.usbè¾“å‡ºé”™è¯¯ä¿¡æ¯
+  * @note
   * @history
   *  Version    Date            Author          Modification
   *  V1.0.0     Nov-11-2019     RM              1. done
@@ -36,18 +36,18 @@ const error_t *error_list_usb_local;
 
 
 
-void usb_task(void const * argument)  // !!!!!¸ÃÈÎÎñÒÑ¹Ø±Õ!!!!!
+void usb_task(void const * argument)  // !!!!!è¯¥ä»»åŠ¡å·²å…³é—­!!!!!
 {
     MX_USB_DEVICE_Init();
     error_list_usb_local = get_error_list_point();
 
-		vTaskDelete(NULL);  // É¾³ýÈÎÎñ
-	
+    vTaskDelete(NULL);  // åˆ é™¤ä»»åŠ¡
+
     while(1)
     {
         osDelay(1000);
         usb_printf(
-"******************************\r\n\
+                "******************************\r\n\
 voltage percentage:%d%% \r\n\
 DBUS:%s\r\n\
 chassis motor1:%s\r\n\
@@ -62,19 +62,19 @@ accel sensor:%s\r\n\
 mag sensor:%s\r\n\
 referee usart:%s\r\n\
 ******************************\r\n",
-            get_battery_percentage(), 
-            status[error_list_usb_local[DBUS_TOE].error_exist],
-            status[error_list_usb_local[CHASSIS_MOTOR1_TOE].error_exist],
-            status[error_list_usb_local[CHASSIS_MOTOR2_TOE].error_exist],
-            status[error_list_usb_local[CHASSIS_MOTOR3_TOE].error_exist],
-            status[error_list_usb_local[CHASSIS_MOTOR4_TOE].error_exist],
-            status[error_list_usb_local[YAW_GIMBAL_MOTOR_TOE].error_exist],
-            status[error_list_usb_local[PITCH_GIMBAL_MOTOR_TOE].error_exist],
-            status[error_list_usb_local[TRIGGER_MOTOR_TOE].error_exist],
-            status[error_list_usb_local[BOARD_GYRO_TOE].error_exist],
-            status[error_list_usb_local[BOARD_ACCEL_TOE].error_exist],
-            status[error_list_usb_local[BOARD_MAG_TOE].error_exist],
-            status[error_list_usb_local[REFEREE_TOE].error_exist]);
+                get_battery_percentage(),
+                status[error_list_usb_local[DBUS_TOE].error_exist],
+                status[error_list_usb_local[CHASSIS_MOTOR1_TOE].error_exist],
+                status[error_list_usb_local[CHASSIS_MOTOR2_TOE].error_exist],
+                status[error_list_usb_local[CHASSIS_MOTOR3_TOE].error_exist],
+                status[error_list_usb_local[CHASSIS_MOTOR4_TOE].error_exist],
+                status[error_list_usb_local[YAW_GIMBAL_MOTOR_TOE].error_exist],
+                status[error_list_usb_local[PITCH_GIMBAL_MOTOR_TOE].error_exist],
+                status[error_list_usb_local[TRIGGER_MOTOR_TOE].error_exist],
+                status[error_list_usb_local[BOARD_GYRO_TOE].error_exist],
+                status[error_list_usb_local[BOARD_ACCEL_TOE].error_exist],
+                status[error_list_usb_local[BOARD_MAG_TOE].error_exist],
+                status[error_list_usb_local[REFEREE_TOE].error_exist]);
 
     }
 
@@ -96,24 +96,24 @@ static void usb_printf(const char *fmt,...)
 }
 
 
-/* added by Æ¬¸ç */
-/* Ê¹ÓÃÉ½Íâµ÷ÊÔÖúÊÖÐéÄâÊ¾²¨Æ÷: usb_debug("\x03\xFC%c%c%c\xFC\x03", data1, data2, data3); */
+/* added by ç‰‡å“¥ */
+/* ä½¿ç”¨å±±å¤–è°ƒè¯•åŠ©æ‰‹è™šæ‹Ÿç¤ºæ³¢å™¨: usb_debug("\x03\xFC%c%c%c\xFC\x03", data1, data2, data3); */
 /*usb_debug("\x03\xFC%c%c%c%c\xFC\x03", (int8_t)(gimbal_control.fric1_motor.speed/20), (int8_t)(gimbal_control.fric1_motor.speed_set/20),
 																							(int8_t)(gimbal_control.fric2_motor.speed/20), (int8_t)(gimbal_control.fric2_motor.speed_set/20));*/
 #define USB_DEBUG_SEND_PERIOD 50
 void usb_debug(const char *fmt,...)
 {
-		static uint32_t last_time = 0;
-		uint32_t time = xTaskGetTickCount();
-		if(time - last_time > USB_DEBUG_SEND_PERIOD)
-		{
-			static va_list ap;
-			uint16_t len = 0;
-			va_start(ap, fmt);
-			len = vsprintf((char *)usb_buf, fmt, ap);
-			va_end(ap);
-			CDC_Transmit_FS(usb_buf, len);
-			last_time = time;
-		}
+    static uint32_t last_time = 0;
+    uint32_t time = xTaskGetTickCount();
+    if(time - last_time > USB_DEBUG_SEND_PERIOD)
+    {
+        static va_list ap;
+        uint16_t len = 0;
+        va_start(ap, fmt);
+        len = vsprintf((char *)usb_buf, fmt, ap);
+        va_end(ap);
+        CDC_Transmit_FS(usb_buf, len);
+        last_time = time;
+    }
 }
 

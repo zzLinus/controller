@@ -7,11 +7,11 @@
   *             gyro mode: use euler angle to control, encond mode: use enconde
   *             angle to control. and has some special mode:cali mode, motionless
   *             mode.
-  *             Íê³ÉÔÆÌ¨¿ØÖÆÈÎÎñ£¬ÓÉÓÚÔÆÌ¨Ê¹ÓÃÍÓÂİÒÇ½âËã³öµÄ½Ç¶È£¬Æä·¶Î§ÔÚ£¨-pi,pi£©
-  *             ¹Ê¶øÉèÖÃÄ¿±ê½Ç¶È¾ùÎª·¶Î§£¬´æÔÚĞí¶à¶Ô½Ç¶È¼ÆËãµÄº¯Êı¡£ÔÆÌ¨Ö÷Òª·ÖÎª2ÖÖ
-  *             ×´Ì¬£¬ÍÓÂİÒÇ¿ØÖÆ×´Ì¬ÊÇÀûÓÃ°åÔØÍÓÂİÒÇ½âËãµÄ×ËÌ¬½Ç½øĞĞ¿ØÖÆ£¬±àÂëÆ÷¿ØÖÆ
-  *             ×´Ì¬ÊÇÍ¨¹ıµç»ú·´À¡µÄ±àÂëÖµ¿ØÖÆµÄĞ£×¼£¬´ËÍâ»¹ÓĞĞ£×¼×´Ì¬£¬Í£Ö¹×´Ì¬µÈ¡£
-  * @note       
+  *             å®Œæˆäº‘å°æ§åˆ¶ä»»åŠ¡ï¼Œç”±äºäº‘å°ä½¿ç”¨é™€èºä»ªè§£ç®—å‡ºçš„è§’åº¦ï¼Œå…¶èŒƒå›´åœ¨ï¼ˆ-pi,piï¼‰
+  *             æ•…è€Œè®¾ç½®ç›®æ ‡è§’åº¦å‡ä¸ºèŒƒå›´ï¼Œå­˜åœ¨è®¸å¤šå¯¹è§’åº¦è®¡ç®—çš„å‡½æ•°ã€‚äº‘å°ä¸»è¦åˆ†ä¸º2ç§
+  *             çŠ¶æ€ï¼Œé™€èºä»ªæ§åˆ¶çŠ¶æ€æ˜¯åˆ©ç”¨æ¿è½½é™€èºä»ªè§£ç®—çš„å§¿æ€è§’è¿›è¡Œæ§åˆ¶ï¼Œç¼–ç å™¨æ§åˆ¶
+  *             çŠ¶æ€æ˜¯é€šè¿‡ç”µæœºåé¦ˆçš„ç¼–ç å€¼æ§åˆ¶çš„æ ¡å‡†ï¼Œæ­¤å¤–è¿˜æœ‰æ ¡å‡†çŠ¶æ€ï¼Œåœæ­¢çŠ¶æ€ç­‰ã€‚
+  * @note
   * @history
   *  Version    Date            Author          Modification
   *  V1.0.0     Dec-26-2018     RM              1. done
@@ -35,7 +35,7 @@
 
 
 //pitch speed close-loop PID params, max out and max iout
-//pitch ËÙ¶È»· PID²ÎÊıÒÔ¼° PID×î´óÊä³ö£¬»ı·ÖÊä³ö
+//pitch é€Ÿåº¦ç¯ PIDå‚æ•°ä»¥åŠ PIDæœ€å¤§è¾“å‡ºï¼Œç§¯åˆ†è¾“å‡º
 #define PITCH_SPEED_PID_KP        10000.0f
 #define PITCH_SPEED_PID_KI        50.0f
 #define PITCH_SPEED_PID_KD        0.0f
@@ -43,7 +43,7 @@
 #define PITCH_SPEED_PID_MAX_IOUT  10000.0f
 
 //yaw speed close-loop PID params, max out and max iout
-//yaw ËÙ¶È»· PID²ÎÊıÒÔ¼° PID×î´óÊä³ö£¬»ı·ÖÊä³ö
+//yaw é€Ÿåº¦ç¯ PIDå‚æ•°ä»¥åŠ PIDæœ€å¤§è¾“å‡ºï¼Œç§¯åˆ†è¾“å‡º
 #define YAW_SPEED_PID_KP        8200.0f
 #define YAW_SPEED_PID_KI        15.0f
 #define YAW_SPEED_PID_KD        0.0f
@@ -51,7 +51,7 @@
 #define YAW_SPEED_PID_MAX_IOUT  5000.0f
 
 //pitch gyro angle close-loop PID params, max out and max iout
-//pitch ½Ç¶È»· ½Ç¶ÈÓÉÍÓÂİÒÇ½âËã PID²ÎÊıÒÔ¼° PID×î´óÊä³ö£¬»ı·ÖÊä³ö
+//pitch è§’åº¦ç¯ è§’åº¦ç”±é™€èºä»ªè§£ç®— PIDå‚æ•°ä»¥åŠ PIDæœ€å¤§è¾“å‡ºï¼Œç§¯åˆ†è¾“å‡º
 #define PITCH_GYRO_ABSOLUTE_PID_KP 15.0f
 #define PITCH_GYRO_ABSOLUTE_PID_KI 0.0f
 #define PITCH_GYRO_ABSOLUTE_PID_KD 0.0f
@@ -60,7 +60,7 @@
 #define PITCH_GYRO_ABSOLUTE_PID_MAX_IOUT 0.0f
 
 //yaw gyro angle close-loop PID params, max out and max iout
-//yaw ½Ç¶È»· ½Ç¶ÈÓÉÍÓÂİÒÇ½âËã PID²ÎÊıÒÔ¼° PID×î´óÊä³ö£¬»ı·ÖÊä³ö
+//yaw è§’åº¦ç¯ è§’åº¦ç”±é™€èºä»ªè§£ç®— PIDå‚æ•°ä»¥åŠ PIDæœ€å¤§è¾“å‡ºï¼Œç§¯åˆ†è¾“å‡º
 #define YAW_GYRO_ABSOLUTE_PID_KP        32.0f
 #define YAW_GYRO_ABSOLUTE_PID_KI        0.0f
 #define YAW_GYRO_ABSOLUTE_PID_KD        0.3f
@@ -68,7 +68,7 @@
 #define YAW_GYRO_ABSOLUTE_PID_MAX_IOUT  0.0f
 
 //pitch encode angle close-loop PID params, max out and max iout
-//pitch ½Ç¶È»· ½Ç¶ÈÓÉ±àÂëÆ÷ PID²ÎÊıÒÔ¼° PID×î´óÊä³ö£¬»ı·ÖÊä³ö
+//pitch è§’åº¦ç¯ è§’åº¦ç”±ç¼–ç å™¨ PIDå‚æ•°ä»¥åŠ PIDæœ€å¤§è¾“å‡ºï¼Œç§¯åˆ†è¾“å‡º
 #define PITCH_ENCODE_RELATIVE_PID_KP 15.0f
 #define PITCH_ENCODE_RELATIVE_PID_KI 0.00f
 #define PITCH_ENCODE_RELATIVE_PID_KD 0.0f
@@ -77,7 +77,7 @@
 #define PITCH_ENCODE_RELATIVE_PID_MAX_IOUT 0.0f
 
 //yaw encode angle close-loop PID params, max out and max iout
-//yaw ½Ç¶È»· ½Ç¶ÈÓÉ±àÂëÆ÷ PID²ÎÊıÒÔ¼° PID×î´óÊä³ö£¬»ı·ÖÊä³ö
+//yaw è§’åº¦ç¯ è§’åº¦ç”±ç¼–ç å™¨ PIDå‚æ•°ä»¥åŠ PIDæœ€å¤§è¾“å‡ºï¼Œç§¯åˆ†è¾“å‡º
 #define YAW_ENCODE_RELATIVE_PID_KP        8.0f
 #define YAW_ENCODE_RELATIVE_PID_KI        0.0f
 #define YAW_ENCODE_RELATIVE_PID_KD        0.0f
@@ -85,35 +85,35 @@
 #define YAW_ENCODE_RELATIVE_PID_MAX_IOUT  0.0f
 
 
-//ÈÎÎñ³õÊ¼»¯ ¿ÕÏĞÒ»¶ÎÊ±¼ä
+//ä»»åŠ¡åˆå§‹åŒ– ç©ºé—²ä¸€æ®µæ—¶é—´
 #define GIMBAL_TASK_INIT_TIME 201
-//yaw,pitch¿ØÖÆÍ¨µÀÒÔ¼°×´Ì¬¿ª¹ØÍ¨µÀ
+//yaw,pitchæ§åˆ¶é€šé“ä»¥åŠçŠ¶æ€å¼€å…³é€šé“
 #define YAW_CHANNEL   2
 #define PITCH_CHANNEL 3
 #define GIMBAL_MODE_CHANNEL 0
 
-//turn 180¡ã
-//µôÍ·180 °´¼ü
+//turn 180Â°
+//æ‰å¤´180 æŒ‰é”®
 //#define TURN_KEYBOARD KEY_PRESSED_OFFSET_F
 //turn speed
-//µôÍ·ÔÆÌ¨ËÙ¶È
+//æ‰å¤´äº‘å°é€Ÿåº¦
 #define TURN_SPEED    0.04f
-//²âÊÔ°´¼üÉĞÎ´Ê¹ÓÃ
+//æµ‹è¯•æŒ‰é”®å°šæœªä½¿ç”¨
 #define TEST_KEYBOARD KEY_PRESSED_OFFSET_R
 //rocker value deadband
-//Ò£¿ØÆ÷ÊäÈëËÀÇø£¬ÒòÎªÒ£¿ØÆ÷´æÔÚ²îÒì£¬Ò¡¸ËÔÚÖĞ¼ä£¬ÆäÖµ²»Ò»¶¨ÎªÁã
+//é¥æ§å™¨è¾“å…¥æ­»åŒºï¼Œå› ä¸ºé¥æ§å™¨å­˜åœ¨å·®å¼‚ï¼Œæ‘‡æ†åœ¨ä¸­é—´ï¼Œå…¶å€¼ä¸ä¸€å®šä¸ºé›¶
 #define RC_DEADBAND   10
 
-//ÊÓ¾õ×ø±êËÀÇø
+//è§†è§‰åæ ‡æ­»åŒº
 #define CV_DEADBAND   3
 
-//ÊÓ¾õ»­Ãæ´óĞ¡
+//è§†è§‰ç”»é¢å¤§å°
 #define CV_SIZE_X 640
 #define CV_SIZE_Y 480
 
-//±ÈÀıÒò×Ó
-#define YAW_CV_SEN    -0.000006f  //Î´Ê¹ÓÃ
-#define PITCH_CV_SEN  -0.000007f  //Î´Ê¹ÓÃ
+//æ¯”ä¾‹å› å­
+#define YAW_CV_SEN    -0.000006f  //æœªä½¿ç”¨
+#define PITCH_CV_SEN  -0.000007f  //æœªä½¿ç”¨
 
 #define YAW_RC_SEN    -0.000010f //-0.000005f
 #define PITCH_RC_SEN  -0.000011f //-0.000006f
@@ -127,29 +127,29 @@
 #define GIMBAL_CONTROL_TIME 1
 
 //test mode, 0 close, 1 open
-//ÔÆÌ¨²âÊÔÄ£Ê½ ºê¶¨Òå 0 Îª²»Ê¹ÓÃ²âÊÔÄ£Ê½
+//äº‘å°æµ‹è¯•æ¨¡å¼ å®å®šä¹‰ 0 ä¸ºä¸ä½¿ç”¨æµ‹è¯•æ¨¡å¼
 #define GIMBAL_TEST_MODE 0
 
-//¿ØÖÆÁ½¸öÔÆÌ¨µç»úµÄĞı×ª·½Ïò
+//æ§åˆ¶ä¸¤ä¸ªäº‘å°ç”µæœºçš„æ—‹è½¬æ–¹å‘
 #define PITCH_TURN  1
 #define YAW_TURN    0
 
-//µç»úÂëÅÌÖµ×î´óÒÔ¼°ÖĞÖµ
+//ç”µæœºç ç›˜å€¼æœ€å¤§ä»¥åŠä¸­å€¼
 #define HALF_ECD_RANGE  4096
 #define ECD_RANGE       8191
-//ÔÆÌ¨³õÊ¼»¯»ØÖĞÖµ£¬ÔÊĞíµÄÎó²î,²¢ÇÒÔÚÎó²î·¶Î§ÄÚÍ£Ö¹Ò»¶ÎÊ±¼äÒÔ¼°×î´óÊ±¼ä6sºó½â³ı³õÊ¼»¯×´Ì¬£¬
+//äº‘å°åˆå§‹åŒ–å›ä¸­å€¼ï¼Œå…è®¸çš„è¯¯å·®,å¹¶ä¸”åœ¨è¯¯å·®èŒƒå›´å†…åœæ­¢ä¸€æ®µæ—¶é—´ä»¥åŠæœ€å¤§æ—¶é—´6såè§£é™¤åˆå§‹åŒ–çŠ¶æ€ï¼Œ
 #define GIMBAL_INIT_ANGLE_ERROR     0.1f
 #define GIMBAL_INIT_STOP_TIME       100
 #define GIMBAL_INIT_TIME            6000
 #define GIMBAL_CALI_REDUNDANT_ANGLE 0.1f
-//ÔÆÌ¨³õÊ¼»¯»ØÖĞÖµµÄËÙ¶ÈÒÔ¼°¿ØÖÆµ½µÄ½Ç¶È
+//äº‘å°åˆå§‹åŒ–å›ä¸­å€¼çš„é€Ÿåº¦ä»¥åŠæ§åˆ¶åˆ°çš„è§’åº¦
 #define GIMBAL_INIT_PITCH_SPEED     0.004f
 #define GIMBAL_INIT_YAW_SPEED       0.005f
 
 #define INIT_YAW_SET    0.0f
 #define INIT_PITCH_SET  0.0f
 
-//ÔÆÌ¨Ğ£×¼ÖĞÖµµÄÊ±ºò£¬·¢ËÍÔ­Ê¼µçÁ÷Öµ£¬ÒÔ¼°¶Â×ªÊ±¼ä£¬Í¨¹ıÍÓÂİÒÇÅĞ¶Ï¶Â×ª
+//äº‘å°æ ¡å‡†ä¸­å€¼çš„æ—¶å€™ï¼Œå‘é€åŸå§‹ç”µæµå€¼ï¼Œä»¥åŠå µè½¬æ—¶é—´ï¼Œé€šè¿‡é™€èºä»ªåˆ¤æ–­å µè½¬
 #define GIMBAL_CALI_MOTOR_SET   8000
 #define GIMBAL_CALI_STEP_TIME   2000
 #define GIMBAL_CALI_GYRO_LIMIT  0.1f
@@ -162,16 +162,16 @@
 #define GIMBAL_CALI_START_STEP  GIMBAL_CALI_PITCH_MAX_STEP
 #define GIMBAL_CALI_END_STEP    5
 
-//ÅĞ¶ÏÒ£¿ØÆ÷ÎŞÊäÈëµÄÊ±¼äÒÔ¼°Ò£¿ØÆ÷ÎŞÊäÈëÅĞ¶Ï£¬ÉèÖÃÔÆÌ¨yaw»ØÖĞÖµÒÔ·ÀÍÓÂİÒÇÆ¯ÒÆ
+//åˆ¤æ–­é¥æ§å™¨æ— è¾“å…¥çš„æ—¶é—´ä»¥åŠé¥æ§å™¨æ— è¾“å…¥åˆ¤æ–­ï¼Œè®¾ç½®äº‘å°yawå›ä¸­å€¼ä»¥é˜²é™€èºä»ªæ¼‚ç§»
 #define GIMBAL_MOTIONLESS_RC_DEADLINE 10
 #define GIMBAL_MOTIONLESS_TIME_MAX    3000
 
-//µç»ú±àÂëÖµ×ª»¯³É½Ç¶ÈÖµ
+//ç”µæœºç¼–ç å€¼è½¬åŒ–æˆè§’åº¦å€¼
 #ifndef MOTOR_ECD_TO_RAD
 #define MOTOR_ECD_TO_RAD 0.000766990394f //      2*  PI  /8192
 #endif
 
-// YAWÔÆÌ¨ÏŞÎ»²ÎÊı added by Æ¬¸ç
+// YAWäº‘å°é™ä½å‚æ•° added by ç‰‡å“¥
 #define YAW_MAX_RELATIVE_ANGLE			0.1f
 #define YAW_MIN_RELATIVE_ANGLE			-0.1f
 #define PITCH_MAX_RELATIVE_ANGLE			0.25f
@@ -181,20 +181,20 @@
 #define YAW_OFFSET_ECD_FORWARD			2254
 #define YAW_OFFSET_ECD_BACKWARD			6289
 #else
-	#ifdef INFANTRY2_ZHANG
-	#define YAW_OFFSET_ECD_FORWARD			4200
-	#define YAW_OFFSET_ECD_BACKWARD			77
-	#endif
+#ifdef INFANTRY2_ZHANG
+#define YAW_OFFSET_ECD_FORWARD			4200
+#define YAW_OFFSET_ECD_BACKWARD			77
+#endif
 #endif
 
 
 
 typedef enum
 {
-    GIMBAL_MOTOR_RAW = 0, //µç»úÔ­Ê¼Öµ¿ØÖÆ
-    GIMBAL_MOTOR_GYRO,    //µç»úÍÓÂİÒÇ½Ç¶È¿ØÖÆ
-    GIMBAL_MOTOR_ENCONDE, //µç»ú±àÂëÖµ½Ç¶È¿ØÖÆ
-		GIMBAL_MOTOR_CV,			//µç»úCV¿ØÖÆÄ£Ê½ (²»Ê¹ÓÃÔöÁ¿£¬Ö±½ÓÊ¹ÓÃÎ»ÖÃÁ¿)
+    GIMBAL_MOTOR_RAW = 0, //ç”µæœºåŸå§‹å€¼æ§åˆ¶
+    GIMBAL_MOTOR_GYRO,    //ç”µæœºé™€èºä»ªè§’åº¦æ§åˆ¶
+    GIMBAL_MOTOR_ENCONDE, //ç”µæœºç¼–ç å€¼è§’åº¦æ§åˆ¶
+    GIMBAL_MOTOR_CV,			//ç”µæœºCVæ§åˆ¶æ¨¡å¼ (ä¸ä½¿ç”¨å¢é‡ï¼Œç›´æ¥ä½¿ç”¨ä½ç½®é‡)
 } gimbal_motor_mode_e;
 
 typedef struct
@@ -256,11 +256,11 @@ typedef struct
 
 typedef struct
 {
-  const motor_measure_t *fric_motor_measure;
-  fp32 accel;
-  fp32 speed;
-  fp32 speed_set;
-  int16_t give_current;
+    const motor_measure_t *fric_motor_measure;
+    fp32 accel;
+    fp32 speed;
+    fp32 speed_set;
+    int16_t give_current;
 } fric_motor_t;
 
 typedef struct
@@ -271,31 +271,31 @@ typedef struct
     gimbal_motor_t gimbal_yaw_motor;
     gimbal_motor_t gimbal_pitch_motor;
     gimbal_step_cali_t gimbal_cali;
-		/* Ä¦²ÁÂÖ¿ØÖÆ½á¹¹Ìå */
-		fric_motor_t fric1_motor;
-		pid_type_def fric1_motor_pid;
-		fric_motor_t fric2_motor;
-		pid_type_def fric2_motor_pid;
-		/* 2021.1.13Ìí¼Ó ÓÃÓÚ½ÓÊÕCVÊı¾İ*/
-		const can_CV_t *can_CV;
-		pid_type_def CV_x_pid;
-		pid_type_def CV_y_pid;
-		fp32 CV_x_out, CV_y_out;
-		/********************************/
+    /* æ‘©æ“¦è½®æ§åˆ¶ç»“æ„ä½“ */
+    fric_motor_t fric1_motor;
+    pid_type_def fric1_motor_pid;
+    fric_motor_t fric2_motor;
+    pid_type_def fric2_motor_pid;
+    /* 2021.1.13æ·»åŠ  ç”¨äºæ¥æ”¶CVæ•°æ®*/
+    const can_CV_t *can_CV;
+    pid_type_def CV_x_pid;
+    pid_type_def CV_y_pid;
+    fp32 CV_x_out, CV_y_out;
+    /********************************/
 } gimbal_control_t;
 
 typedef enum
 {
-	GIMBAL_PITCH = 0,
-	GIMBAL_YAW,
+    GIMBAL_PITCH = 0,
+    GIMBAL_YAW,
 } gimbal_axis_e;
 
 
 typedef enum
 {
-	GIMBAL_YAW_FORWARD,
-	GIMBAL_YAW_BACKWARD,
-} gimbal_yaw_direction_e;  // yawÔÆÌ¨ÏòÇ°»òÏòºó
+    GIMBAL_YAW_FORWARD,
+    GIMBAL_YAW_BACKWARD,
+} gimbal_yaw_direction_e;  // yawäº‘å°å‘å‰æˆ–å‘å
 
 /**
   * @brief          return yaw motor data point
@@ -303,9 +303,9 @@ typedef enum
   * @retval         yaw motor data point
   */
 /**
-  * @brief          ·µ»Øyaw µç»úÊı¾İÖ¸Õë
+  * @brief          è¿”å›yaw ç”µæœºæ•°æ®æŒ‡é’ˆ
   * @param[in]      none
-  * @retval         yawµç»úÖ¸Õë
+  * @retval         yawç”µæœºæŒ‡é’ˆ
   */
 extern const gimbal_motor_t *get_yaw_motor_point(void);
 
@@ -315,20 +315,20 @@ extern const gimbal_motor_t *get_yaw_motor_point(void);
   * @retval         pitch motor data point
   */
 /**
-  * @brief          ·µ»Øpitch µç»úÊı¾İÖ¸Õë
+  * @brief          è¿”å›pitch ç”µæœºæ•°æ®æŒ‡é’ˆ
   * @param[in]      none
   * @retval         pitch
   */
 extern const gimbal_motor_t *get_pitch_motor_point(void);
 
 /**
-  * @brief          gimbal task, osDelay GIMBAL_CONTROL_TIME (1ms) 
+  * @brief          gimbal task, osDelay GIMBAL_CONTROL_TIME (1ms)
   * @param[in]      pvParameters: null
   * @retval         none
   */
 /**
-  * @brief          ÔÆÌ¨ÈÎÎñ£¬¼ä¸ô GIMBAL_CONTROL_TIME 1ms
-  * @param[in]      pvParameters: ¿Õ
+  * @brief          äº‘å°ä»»åŠ¡ï¼Œé—´éš” GIMBAL_CONTROL_TIME 1ms
+  * @param[in]      pvParameters: ç©º
   * @retval         none
   */
 
@@ -345,15 +345,15 @@ extern void gimbal_task(void const *pvParameters);
   * @retval         none
   */
 /**
-  * @brief          ÔÆÌ¨Ğ£×¼¼ÆËã£¬½«Ğ£×¼¼ÇÂ¼µÄÖĞÖµ,×î´ó ×îĞ¡Öµ·µ»Ø
-  * @param[out]     yaw ÖĞÖµ Ö¸Õë
-  * @param[out]     pitch ÖĞÖµ Ö¸Õë
-  * @param[out]     yaw ×î´óÏà¶Ô½Ç¶È Ö¸Õë
-  * @param[out]     yaw ×îĞ¡Ïà¶Ô½Ç¶È Ö¸Õë
-  * @param[out]     pitch ×î´óÏà¶Ô½Ç¶È Ö¸Õë
-  * @param[out]     pitch ×îĞ¡Ïà¶Ô½Ç¶È Ö¸Õë
-  * @retval         ·µ»Ø1 ´ú±í³É¹¦Ğ£×¼Íê±Ï£¬ ·µ»Ø0 ´ú±íÎ´Ğ£×¼Íê
-  * @waring         Õâ¸öº¯ÊıÊ¹ÓÃµ½gimbal_control ¾²Ì¬±äÁ¿µ¼ÖÂº¯Êı²»ÊÊÓÃÒÔÉÏÍ¨ÓÃÖ¸Õë¸´ÓÃ
+  * @brief          äº‘å°æ ¡å‡†è®¡ç®—ï¼Œå°†æ ¡å‡†è®°å½•çš„ä¸­å€¼,æœ€å¤§ æœ€å°å€¼è¿”å›
+  * @param[out]     yaw ä¸­å€¼ æŒ‡é’ˆ
+  * @param[out]     pitch ä¸­å€¼ æŒ‡é’ˆ
+  * @param[out]     yaw æœ€å¤§ç›¸å¯¹è§’åº¦ æŒ‡é’ˆ
+  * @param[out]     yaw æœ€å°ç›¸å¯¹è§’åº¦ æŒ‡é’ˆ
+  * @param[out]     pitch æœ€å¤§ç›¸å¯¹è§’åº¦ æŒ‡é’ˆ
+  * @param[out]     pitch æœ€å°ç›¸å¯¹è§’åº¦ æŒ‡é’ˆ
+  * @retval         è¿”å›1 ä»£è¡¨æˆåŠŸæ ¡å‡†å®Œæ¯•ï¼Œ è¿”å›0 ä»£è¡¨æœªæ ¡å‡†å®Œ
+  * @waring         è¿™ä¸ªå‡½æ•°ä½¿ç”¨åˆ°gimbal_control é™æ€å˜é‡å¯¼è‡´å‡½æ•°ä¸é€‚ç”¨ä»¥ä¸Šé€šç”¨æŒ‡é’ˆå¤ç”¨
   */
 extern bool_t cmd_cali_gimbal_hook(uint16_t *yaw_offset, uint16_t *pitch_offset, fp32 *max_yaw, fp32 *min_yaw, fp32 *max_pitch, fp32 *min_pitch);
 
@@ -368,15 +368,15 @@ extern bool_t cmd_cali_gimbal_hook(uint16_t *yaw_offset, uint16_t *pitch_offset,
   * @retval         none
   */
 /**
-  * @brief          ÔÆÌ¨Ğ£×¼ÉèÖÃ£¬½«Ğ£×¼µÄÔÆÌ¨ÖĞÖµÒÔ¼°×îĞ¡×î´ó»úĞµÏà¶Ô½Ç¶È
-  * @param[in]      yaw_offse:yaw ÖĞÖµ
-  * @param[in]      pitch_offset:pitch ÖĞÖµ
-  * @param[in]      max_yaw:max_yaw:yaw ×î´óÏà¶Ô½Ç¶È
-  * @param[in]      min_yaw:yaw ×îĞ¡Ïà¶Ô½Ç¶È
-  * @param[in]      max_yaw:pitch ×î´óÏà¶Ô½Ç¶È
-  * @param[in]      min_yaw:pitch ×îĞ¡Ïà¶Ô½Ç¶È
-  * @retval         ·µ»Ø¿Õ
-  * @waring         Õâ¸öº¯ÊıÊ¹ÓÃµ½gimbal_control ¾²Ì¬±äÁ¿µ¼ÖÂº¯Êı²»ÊÊÓÃÒÔÉÏÍ¨ÓÃÖ¸Õë¸´ÓÃ
+  * @brief          äº‘å°æ ¡å‡†è®¾ç½®ï¼Œå°†æ ¡å‡†çš„äº‘å°ä¸­å€¼ä»¥åŠæœ€å°æœ€å¤§æœºæ¢°ç›¸å¯¹è§’åº¦
+  * @param[in]      yaw_offse:yaw ä¸­å€¼
+  * @param[in]      pitch_offset:pitch ä¸­å€¼
+  * @param[in]      max_yaw:max_yaw:yaw æœ€å¤§ç›¸å¯¹è§’åº¦
+  * @param[in]      min_yaw:yaw æœ€å°ç›¸å¯¹è§’åº¦
+  * @param[in]      max_yaw:pitch æœ€å¤§ç›¸å¯¹è§’åº¦
+  * @param[in]      min_yaw:pitch æœ€å°ç›¸å¯¹è§’åº¦
+  * @retval         è¿”å›ç©º
+  * @waring         è¿™ä¸ªå‡½æ•°ä½¿ç”¨åˆ°gimbal_control é™æ€å˜é‡å¯¼è‡´å‡½æ•°ä¸é€‚ç”¨ä»¥ä¸Šé€šç”¨æŒ‡é’ˆå¤ç”¨
   */
 extern void set_cali_gimbal_hook(const uint16_t yaw_offset, const uint16_t pitch_offset, const fp32 max_yaw, const fp32 min_yaw, const fp32 max_pitch, const fp32 min_pitch);
 void gimbal_cv_pid_calc(const fp32 x_v, const fp32 y_v);

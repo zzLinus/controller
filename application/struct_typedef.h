@@ -17,12 +17,12 @@ typedef float fp32;
 typedef double fp64;
 
 
-/* Ìõ¼ş±àÒë¿ª¹Ø£ºÇĞ»»»·²½ºÍÕÅ²½ */
+/* æ¡ä»¶ç¼–è¯‘å¼€å…³ï¼šåˆ‡æ¢ç¯æ­¥å’Œå¼ æ­¥ */
 //#define INFANTRY1_HUAN
 #define INFANTRY2_ZHANG
 
 /*
-ÓÃÀı£º
+ç”¨ä¾‹ï¼š
 
 #ifdef INFANTRY1_HUAN
 #define YAW_OFFSET_ECD_FORWARD			00

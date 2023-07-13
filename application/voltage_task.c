@@ -2,9 +2,9 @@
   ****************************(C) COPYRIGHT 2019 DJI****************************
   * @file       voltage_task.c/h
   * @brief      24v power voltage ADC task, get voltage and calculate electricity
-  *             percentage.24µçÔ´µçÑ¹ADCÈÎÎñ,»ñÈ¡µçÑ¹²¢ÇÒ¼ÆËãµçÁ¿°Ù·Ö±È.
+  *             percentage.24ç”µæºç”µå‹ADCä»»åŠ¡,è·å–ç”µå‹å¹¶ä¸”è®¡ç®—ç”µé‡ç™¾åˆ†æ¯”.
   * @note       when power is not derectly link to delelopment, please change VOLTAGE_DROP
-  *             µ±µçÔ´²»Ö±Á¬¿ª·¢°å,ÇëĞŞ¸ÄVOLTAGE_DROP
+  *             å½“ç”µæºä¸ç›´è¿å¼€å‘æ¿,è¯·ä¿®æ”¹VOLTAGE_DROP
   * @history
   *  Version    Date            Author          Modification
   *  V1.0.0     Nov-11-2019     RM              1. done
@@ -24,7 +24,7 @@
 #include "user_lib.h"
 
 #define FULL_BATTER_VOLTAGE     25.2f
-#define LOW_BATTER_VOLTAGE      22.2f   //about 20% 
+#define LOW_BATTER_VOLTAGE      22.2f   //about 20%
 
 #define VOLTAGE_DROP            0.00f
 
@@ -41,18 +41,18 @@ fp32 electricity_percentage;
   * @retval         none
   */
 /**
-  * @brief          µçÔ´²ÉÑùºÍ¼ÆËãµçÔ´°Ù·Ö±È
+  * @brief          ç”µæºé‡‡æ ·å’Œè®¡ç®—ç”µæºç™¾åˆ†æ¯”
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
-void battery_voltage_task(void const * argument)  // !!!!!¸ÃÈÎÎñÒÑ¹Ø±Õ!!!!!
+void battery_voltage_task(void const * argument)  // !!!!!è¯¥ä»»åŠ¡å·²å…³é—­!!!!!
 {
     osDelay(1000);
     //use inner 1.2v to calbrate
     init_vrefint_reciprocal();
-	
-		vTaskDelete(NULL);  // É¾³ıÈÎÎñ
-	
+
+    vTaskDelete(NULL);  // åˆ é™¤ä»»åŠ¡
+
     while(1)
     {
         battery_voltage = get_battery_voltage() + VOLTAGE_DROP;
@@ -66,7 +66,7 @@ static fp32 calc_battery_percentage(float voltage)
     fp32 percentage;
     fp32 voltage_2 = voltage * voltage;
     fp32 voltage_3 = voltage_2 * voltage;
-    
+
     if(voltage < 19.5f)
     {
         percentage = 0.0f;
@@ -92,7 +92,7 @@ static fp32 calc_battery_percentage(float voltage)
         percentage = 1.0f;
     }
     //another formulas
-    //ÁíÒ»Ì×¹«Ê½
+    //å¦ä¸€å¥—å…¬å¼
 //    if(voltage < 19.5f)
 //    {
 //        percentage = 0.0f;

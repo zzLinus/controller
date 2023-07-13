@@ -1,8 +1,8 @@
 /**
   ****************************(C) COPYRIGHT 2019 DJI****************************
   * @file       referee_usart_task.c/h
-  * @brief      RM referee system data solve. RM²ÃÅÐÏµÍ³Êý¾Ý´¦Àí
-  * @note       
+  * @brief      RM referee system data solve. RMè£åˆ¤ç³»ç»Ÿæ•°æ®å¤„ç†
+  * @note
   * @history
   *  Version    Date            Author          Modification
   *  V1.0.0     Nov-11-2019     RM              1. done
@@ -30,18 +30,18 @@
 
 
 /**
-  * @brief          single byte upacked 
+  * @brief          single byte upacked
   * @param[in]      void
   * @retval         none
   */
 /**
-  * @brief          µ¥×Ö½Ú½â°ü
+  * @brief          å•å­—èŠ‚è§£åŒ…
   * @param[in]      void
   * @retval         none
   */
 static void referee_unpack_fifo_data(void);
 
- 
+
 extern UART_HandleTypeDef huart6;
 
 uint8_t usart6_buf[2][USART_RX_BUF_LENGHT];
@@ -56,7 +56,7 @@ unpack_data_t referee_unpack_obj;
   * @retval         none
   */
 /**
-  * @brief          ²ÃÅÐÏµÍ³ÈÎÎñ
+  * @brief          è£åˆ¤ç³»ç»Ÿä»»åŠ¡
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
@@ -76,110 +76,110 @@ void referee_usart_task(void const * argument)
 
 
 /**
-  * @brief          single byte upacked 
+  * @brief          single byte upacked
   * @param[in]      void
   * @retval         none
   */
 /**
-  * @brief          µ¥×Ö½Ú½â°ü
+  * @brief          å•å­—èŠ‚è§£åŒ…
   * @param[in]      void
   * @retval         none
   */
 void referee_unpack_fifo_data(void)
 {
-  uint8_t byte = 0;
-  uint8_t sof = HEADER_SOF;
-  unpack_data_t *p_obj = &referee_unpack_obj;
+    uint8_t byte = 0;
+    uint8_t sof = HEADER_SOF;
+    unpack_data_t *p_obj = &referee_unpack_obj;
 
-  while ( fifo_s_used(&referee_fifo) )
-  {
-    byte = fifo_s_get(&referee_fifo);
-    switch(p_obj->unpack_step)
+    while ( fifo_s_used(&referee_fifo) )
     {
-      case STEP_HEADER_SOF:
-      {
-        if(byte == sof)
+        byte = fifo_s_get(&referee_fifo);
+        switch(p_obj->unpack_step)
         {
-          p_obj->unpack_step = STEP_LENGTH_LOW;
-          p_obj->protocol_packet[p_obj->index++] = byte;
-        }
-        else
-        {
-          p_obj->index = 0;
-        }
-      }break;
-      
-      case STEP_LENGTH_LOW:
-      {
-        p_obj->data_len = byte;
-        p_obj->protocol_packet[p_obj->index++] = byte;
-        p_obj->unpack_step = STEP_LENGTH_HIGH;
-      }break;
-      
-      case STEP_LENGTH_HIGH:
-      {
-        p_obj->data_len |= (byte << 8);
-        p_obj->protocol_packet[p_obj->index++] = byte;
+            case STEP_HEADER_SOF:
+            {
+                if(byte == sof)
+                {
+                    p_obj->unpack_step = STEP_LENGTH_LOW;
+                    p_obj->protocol_packet[p_obj->index++] = byte;
+                }
+                else
+                {
+                    p_obj->index = 0;
+                }
+            }break;
 
-        if(p_obj->data_len < (REF_PROTOCOL_FRAME_MAX_SIZE - REF_HEADER_CRC_CMDID_LEN))
-        {
-          p_obj->unpack_step = STEP_FRAME_SEQ;
-        }
-        else
-        {
-          p_obj->unpack_step = STEP_HEADER_SOF;
-          p_obj->index = 0;
-        }
-      }break;
-      case STEP_FRAME_SEQ:
-      {
-        p_obj->protocol_packet[p_obj->index++] = byte;
-        p_obj->unpack_step = STEP_HEADER_CRC8;
-      }break;
+            case STEP_LENGTH_LOW:
+            {
+                p_obj->data_len = byte;
+                p_obj->protocol_packet[p_obj->index++] = byte;
+                p_obj->unpack_step = STEP_LENGTH_HIGH;
+            }break;
 
-      case STEP_HEADER_CRC8:
-      {
-        p_obj->protocol_packet[p_obj->index++] = byte;
+            case STEP_LENGTH_HIGH:
+            {
+                p_obj->data_len |= (byte << 8);
+                p_obj->protocol_packet[p_obj->index++] = byte;
 
-        if (p_obj->index == REF_PROTOCOL_HEADER_SIZE)
-        {
-          if ( verify_CRC8_check_sum(p_obj->protocol_packet, REF_PROTOCOL_HEADER_SIZE) )
-          {
-            p_obj->unpack_step = STEP_DATA_CRC16;
-          }
-          else
-          {
-            p_obj->unpack_step = STEP_HEADER_SOF;
-            p_obj->index = 0;
-          }
-        }
-      }break;  
-      
-      case STEP_DATA_CRC16:
-      {
-        if (p_obj->index < (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
-        {
-           p_obj->protocol_packet[p_obj->index++] = byte;  
-        }
-        if (p_obj->index >= (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
-        {
-          p_obj->unpack_step = STEP_HEADER_SOF;
-          p_obj->index = 0;
+                if(p_obj->data_len < (REF_PROTOCOL_FRAME_MAX_SIZE - REF_HEADER_CRC_CMDID_LEN))
+                {
+                    p_obj->unpack_step = STEP_FRAME_SEQ;
+                }
+                else
+                {
+                    p_obj->unpack_step = STEP_HEADER_SOF;
+                    p_obj->index = 0;
+                }
+            }break;
+            case STEP_FRAME_SEQ:
+            {
+                p_obj->protocol_packet[p_obj->index++] = byte;
+                p_obj->unpack_step = STEP_HEADER_CRC8;
+            }break;
 
-          if ( verify_CRC16_check_sum(p_obj->protocol_packet, REF_HEADER_CRC_CMDID_LEN + p_obj->data_len) )
-          {
-            referee_data_solve(p_obj->protocol_packet);
-          }
-        }
-      }break;
+            case STEP_HEADER_CRC8:
+            {
+                p_obj->protocol_packet[p_obj->index++] = byte;
 
-      default:
-      {
-        p_obj->unpack_step = STEP_HEADER_SOF;
-        p_obj->index = 0;
-      }break;
+                if (p_obj->index == REF_PROTOCOL_HEADER_SIZE)
+                {
+                    if ( verify_CRC8_check_sum(p_obj->protocol_packet, REF_PROTOCOL_HEADER_SIZE) )
+                    {
+                        p_obj->unpack_step = STEP_DATA_CRC16;
+                    }
+                    else
+                    {
+                        p_obj->unpack_step = STEP_HEADER_SOF;
+                        p_obj->index = 0;
+                    }
+                }
+            }break;
+
+            case STEP_DATA_CRC16:
+            {
+                if (p_obj->index < (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+                {
+                    p_obj->protocol_packet[p_obj->index++] = byte;
+                }
+                if (p_obj->index >= (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+                {
+                    p_obj->unpack_step = STEP_HEADER_SOF;
+                    p_obj->index = 0;
+
+                    if ( verify_CRC16_check_sum(p_obj->protocol_packet, REF_HEADER_CRC_CMDID_LEN + p_obj->data_len) )
+                    {
+                        referee_data_solve(p_obj->protocol_packet);
+                    }
+                }
+            }break;
+
+            default:
+            {
+                p_obj->unpack_step = STEP_HEADER_SOF;
+                p_obj->index = 0;
+            }break;
+        }
     }
-  }
 }
 
 
@@ -214,5 +214,4 @@ void USART6_IRQHandler(void)
         }
     }
 }
-
 

@@ -82,85 +82,85 @@ void referee_data_solve(uint8_t *frame)
         {
             memcpy(&game_state, frame + index, sizeof(ext_game_state_t));
         }
-        break;
+            break;
         case GAME_RESULT_CMD_ID:
         {
             memcpy(&game_result, frame + index, sizeof(game_result));
         }
-        break;
+            break;
         case GAME_ROBOT_HP_CMD_ID:
         {
             memcpy(&game_robot_HP_t, frame + index, sizeof(ext_game_robot_HP_t));
         }
-        break;
+            break;
 
 
         case FIELD_EVENTS_CMD_ID:
         {
             memcpy(&field_event, frame + index, sizeof(field_event));
         }
-        break;
+            break;
         case SUPPLY_PROJECTILE_ACTION_CMD_ID:
         {
             memcpy(&supply_projectile_action_t, frame + index, sizeof(supply_projectile_action_t));
         }
-        break;
+            break;
         case SUPPLY_PROJECTILE_BOOKING_CMD_ID:
         {
             memcpy(&supply_projectile_booking_t, frame + index, sizeof(supply_projectile_booking_t));
         }
-        break;
+            break;
         case REFEREE_WARNING_CMD_ID:
         {
             memcpy(&referee_warning_t, frame + index, sizeof(ext_referee_warning_t));
         }
-        break;
+            break;
 
         case ROBOT_STATE_CMD_ID:
         {
             memcpy(&robot_state, frame + index, sizeof(robot_state));
         }
-        break;
+            break;
         case POWER_HEAT_DATA_CMD_ID:
         {
             memcpy(&power_heat_data_t, frame + index, sizeof(power_heat_data_t));
         }
-        break;
+            break;
         case ROBOT_POS_CMD_ID:
         {
             memcpy(&game_robot_pos_t, frame + index, sizeof(game_robot_pos_t));
         }
-        break;
+            break;
         case BUFF_MUSK_CMD_ID:
         {
             memcpy(&buff_musk_t, frame + index, sizeof(buff_musk_t));
         }
-        break;
+            break;
         case AERIAL_ROBOT_ENERGY_CMD_ID:
         {
             memcpy(&robot_energy_t, frame + index, sizeof(robot_energy_t));
         }
-        break;
+            break;
         case ROBOT_HURT_CMD_ID:
         {
             memcpy(&robot_hurt_t, frame + index, sizeof(robot_hurt_t));
         }
-        break;
+            break;
         case SHOOT_DATA_CMD_ID:
         {
             memcpy(&shoot_data_t, frame + index, sizeof(shoot_data_t));
         }
-        break;
+            break;
         case BULLET_REMAINING_CMD_ID:
         {
             memcpy(&bullet_remaining_t, frame + index, sizeof(ext_bullet_remaining_t));
         }
-        break;
+            break;
         case STUDENT_INTERACTIVE_DATA_CMD_ID:
         {
             memcpy(&student_interactive_data_t, frame + index, sizeof(student_interactive_data_t));
         }
-        break;
+            break;
         default:
         {
             break;
