@@ -150,7 +150,7 @@ C_SOURCES += $(wildcard components/algorithm/Source/**/*.c)
 C_SOURCES += $(wildcard components/support/*.c)
 
 ASM_SOURCES =  \
-startup_stm32f407xx.s
+Startup/startup_stm32f407ighx.s
 
 WORK_DIR  = $(shell pwd)
 
@@ -234,6 +234,7 @@ ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2
 endif
 
+CFLAGS += -D ARM_MATH_CM4
 
 # Generate dependency information
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
