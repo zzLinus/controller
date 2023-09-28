@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/Core/Inc/pid.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Core/Inc/remote_control.h" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Core/Inc/vector.h" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Core/Src/NX_Calculate.c" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Core/Src/main.c" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Core/Src/oled.c" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Core/Src/oledfont.c" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Core/Src/remote_control.c" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Core/Src/stm32f4xx_it.c" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Core/Src/vector.c" charset="UTF-8" />
+    <file url="PROJECT" charset="GBK" />
+  </component>
+</project>

@@ -1,0 +1,3 @@
+/home/zzlinus/dev/stm32/b_version/build/CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir
+/home/zzlinus/dev/stm32/b_version/build/CMakeFiles/edit_cache.dir
+/home/zzlinus/dev/stm32/b_version/build/CMakeFiles/rebuild_cache.dir
