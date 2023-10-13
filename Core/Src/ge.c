@@ -1,4 +1,5 @@
 #include "ge.h"
+#include "com.h"
 
 int check_zero_row(double matrix[3][4], int rows, int columns) {
 	
@@ -38,14 +39,10 @@ int check_zero_row(double matrix[3][4], int rows, int columns) {
  *	rows: number of rows in arr
  *	columns: number of columns in arr
  */
-void print_matrix(float arr[3][4], int rows, int columns) {
+void print_matrix(double arr[3][4], int rows, int columns) {
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < columns; j++) {
-			if(arr[i][j] == 0 || arr[i][j] == -0) {
-				cprintf(&huart1,"%.2lf  ", 0.0);
-			} else {
-				cprintf(&huart1,"%.2lf  ", arr[i][j]);
-			}
+				cprintf(&huart1,"%lf  ", arr[i][j]);
 		}
 		cprintf(&huart1,"\n");
 	}
@@ -70,11 +67,13 @@ void print_matrix(float arr[3][4], int rows, int columns) {
 double* gaussian_elimination(double matrix[3][4], int rows, int columns) 
 {
 	int zero_rows;
+	/**print_matrix(matrix, rows + zero_rows, columns);*/
 
 	zero_rows = check_zero_row(matrix, rows, columns);
 	rows -= zero_rows;
 
 
+	/**print_matrix(matrix, rows + zero_rows, columns);*/
 	// Gauss Jordan Elimination
 	int n = rows - 1;
 	int i, j, k;	
@@ -93,6 +92,7 @@ double* gaussian_elimination(double matrix[3][4], int rows, int columns)
 			}
 		}
 	}
+
 	
 	// Print Upper Triangular matrix for debugging
 	/**cprintf(&huart1,"\n\n--------Upper Triangular Matrix--------\n");*/
