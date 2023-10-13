@@ -12,9 +12,9 @@
 #include "oledfont.h"
 #include "pid.h"
 #include "remote_control.h"
+#include "stdlib.h"
 #include "tim.h"
 #include "usart.h"
-#include "stdlib.h"
 
 uint8_t Receive_Var[2];
 uint8_t Receive_Bluetooth;
@@ -33,7 +33,8 @@ const int full_cir = 8192;
 const int zero_angle[3] = { ((full_cir >> 1) + 4128) % full_cir,
                             ((full_cir >> 1) + 3302) % full_cir,
                             ((full_cir >> 1) + 3178) % full_cir };
-const double G = 4.30;
+const double G1 = 2.0;
+const double G = 8.3;
 RemoteControl *rc;
 
 int main(void)
@@ -106,72 +107,69 @@ int main(void)
         }
 
         double g_matrix[3][4] = {};
-        double *F ;
+        /**double *F ;*/
+        double F1[3];
+        double *F;
         Vec3d moto_rotevec[3] = { { 0, -1, 0 },
                                   { -sin(M_PI / 3), cos(M_PI / 3), 0 },
-                                  { cos(M_PI / 6), sin(M_PI / 6), 0 }
-				};
-				Vec3d t_vex[3] = {0};
+                                  { cos(M_PI / 6), sin(M_PI / 6), 0 } };
+        Vec3d t_vex[3] = { 0 };
 
-				/**cprintf(&huart1, "a : [%f %f %f]\n", rc->a.x,rc->a.y,rc->a.z);*/
-				/**cprintf(&huart1, "b : [%f %f %f]\n", rc->b.x,rc->b.y,rc->b.z);*/
-				/**cprintf(&huart1, "c : [%f %f %f]\n", rc->c.x,rc->c.y,rc->c.z);*/
-				chan_axis(rc);
-				/**cprintf(&huart1, "a : [%f %f %f]\n", rc->a.x,rc->a.y,rc->a.z);*/
-				/**cprintf(&huart1, "b : [%f %f %f]\n", rc->b.x,rc->b.y,rc->b.z);*/
-				/**cprintf(&huart1, "c : [%f %f %f]\n", rc->c.x,rc->c.y,rc->c.z);*/
-				cross(&rc->a,&moto_rotevec[0],&t_vex[0]);
-				cross(&rc->b,&moto_rotevec[1],&t_vex[1]);
-				cross(&rc->c,&moto_rotevec[2],&t_vex[2]);
-				mul(1.0 / norm(&t_vex[0]), &t_vex[0], &t_vex[0]);
-				mul(1.0 / norm(&t_vex[1]), &t_vex[1], &t_vex[1]);
-				mul(1.0 / norm(&t_vex[2]), &t_vex[2], &t_vex[2]);
-				/**cprintf(&huart1, "t1 : [%f %f %f]\n", t_vex[0].x,t_vex[0].y,t_vex[0].z);*/
-				/**cprintf(&huart1, "t2 : [%f %f %f]\n", t_vex[1].x,t_vex[1].y,t_vex[1].z);*/
-				/**cprintf(&huart1, "t3 : [%f %f %f]\n", t_vex[2].x,t_vex[2].y,t_vex[2].z);*/
+        /**cprintf(&huart1, "a : [%f %f %f]\n", rc->a.x,rc->a.y,rc->a.z);*/
+        /**cprintf(&huart1, "b : [%f %f %f]\n", rc->b.x,rc->b.y,rc->b.z);*/
+        /**cprintf(&huart1, "c : [%f %f %f]\n", rc->c.x,rc->c.y,rc->c.z);*/
+        chan_axis(rc);
+        /**cprintf(&huart1, "a : [%f %f %f]\n", rc->a.x,rc->a.y,rc->a.z);*/
+        /**cprintf(&huart1, "b : [%f %f %f]\n", rc->b.x,rc->b.y,rc->b.z);*/
+        /**cprintf(&huart1, "c : [%f %f %f]\n", rc->c.x,rc->c.y,rc->c.z);*/
+        cross(&rc->a, &moto_rotevec[0], &t_vex[0]);
+        cross(&rc->b, &moto_rotevec[1], &t_vex[1]);
+        cross(&rc->c, &moto_rotevec[2], &t_vex[2]);
+        mul(1.0 / norm(&t_vex[0]), &t_vex[0], &t_vex[0]);
+        mul(1.0 / norm(&t_vex[1]), &t_vex[1], &t_vex[1]);
+        mul(1.0 / norm(&t_vex[2]), &t_vex[2], &t_vex[2]);
+        /**cprintf(&huart1, "t1 : [%f %f %f]\n", t_vex[0].x,t_vex[0].y,t_vex[0].z);*/
+        /**cprintf(&huart1, "t2 : [%f %f %f]\n", t_vex[1].x,t_vex[1].y,t_vex[1].z);*/
+        /**cprintf(&huart1, "t3 : [%f %f %f]\n", t_vex[2].x,t_vex[2].y,t_vex[2].z);*/
 
-				/**    cprintf(*/
-				/**        &huart1,*/
-				/**        "pos: (%lf, %lf, %lf)\n",*/
-				/**        -rc->center.z,*/
-				/**        rc->center.y,*/
-				/**        rc->center.x);*/
-				g_matrix[0][0] = t_vex[0].x;
-				g_matrix[0][1] = t_vex[1].x;
-				g_matrix[0][2] = t_vex[2].x;
-				g_matrix[0][3] = 0;
+        // all in one gravity compensation ----------------
+        /**    cprintf(*/
+        /**        &huart1,*/
+        /**        "pos: (%lf, %lf, %lf)\n",*/
+        /**        -rc->center.z,*/
+        /**        rc->center.y,*/
+        /**        rc->center.x);*/
+        g_matrix[0][0] = t_vex[0].x;
+        g_matrix[0][1] = t_vex[1].x;
+        g_matrix[0][2] = t_vex[2].x;
+        g_matrix[0][3] = 0;
 
-				g_matrix[1][0] = t_vex[0].y;
-				g_matrix[1][1] = t_vex[1].y;
-				g_matrix[1][2] = t_vex[2].y;
-				g_matrix[1][3] = 0;
+        g_matrix[1][0] = t_vex[0].y;
+        g_matrix[1][1] = t_vex[1].y;
+        g_matrix[1][2] = t_vex[2].y;
+        g_matrix[1][3] = 0;
 
-				g_matrix[2][0] = t_vex[0].z;
-				g_matrix[2][1] = t_vex[1].z;
-				g_matrix[2][2] = t_vex[2].z;
+        g_matrix[2][0] = t_vex[0].z;
+        g_matrix[2][1] = t_vex[1].z;
+        g_matrix[2][2] = t_vex[2].z;
 				g_matrix[2][3] = G;
-				/**for(int i = 0;i < 3;++i){*/
-				/**    cprintf(&huart1,"| ");*/
-				/**    for(int j = 0; j<4;++j){*/
-				/**        cprintf(&huart1,"%f ",g_matrix[i][j]);*/
-				/**    }*/
-				/**    cprintf(&huart1,"|\n");*/
-				/**}*/
+        /**for(int i = 0;i < 3;++i){*/
+        /**    cprintf(&huart1,"| ");*/
+        /**    for(int j = 0; j<4;++j){*/
+        /**        cprintf(&huart1,"%f ",g_matrix[i][j]);*/
+        /**    }*/
+        /**    cprintf(&huart1,"|\n");*/
+        /**}*/
 
-				F = gaussian_elimination(g_matrix,3,4);
+        F = gaussian_elimination(g_matrix, 3, 4);
+        // ------------------------------------------------------
 
-				/**for(int i = 0;i < 3;++i){*/
-				/**    cprintf(&huart1,"| ");*/
-				/**    for(int j = 0; j<4;++j){*/
-				/**        cprintf(&huart1,"%f ",g_matrix[i][j]);*/
-				/**    }*/
-				/**    cprintf(&huart1,"|\n");*/
-				/**}*/
+        F1[0] = G1 * cos(M_PI - angle[0]);
+        F1[1] = G1 * cos(M_PI - angle[1]);
+        F1[2] = G1 * cos(M_PI - angle[2]);
+        set_moto_current(&hcan1, (F1[0] + F[0]) * 1000, (F1[1] + F[1]) * 1000, (F1[2] + F[2]) * 1000, 0);
 
-				cprintf(&huart1, "solution : [%f %f %f]\n", F[0], F[1], F[2]);
-				set_moto_current(&hcan1, F[0] * 3700, F[1] * 3700, F[2] * 3700, 0);
-
-				free(F);
+        free(F);
         HAL_Delay(1);
     }
     MX_FREERTOS_Init();
