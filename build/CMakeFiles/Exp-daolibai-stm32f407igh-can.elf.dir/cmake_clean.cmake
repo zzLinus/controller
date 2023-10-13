@@ -11,6 +11,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/Core/Src/com.c.obj.d"
   "CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/Core/Src/freertos.c.obj"
   "CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/Core/Src/freertos.c.obj.d"
+  "CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/Core/Src/ge.c.obj"
+  "CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/Core/Src/ge.c.obj.d"
   "CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/Core/Src/gpio.c.obj"
   "CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/Core/Src/gpio.c.obj.d"
   "CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/Core/Src/i2c.c.obj"

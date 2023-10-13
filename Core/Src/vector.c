@@ -3,6 +3,8 @@
 //
 
 #include "vector.h"
+#include "com.h"
+#include "usart.h"
 #include "math.h"
 
 unsigned char vector_error_flag = 0;

@@ -273,6 +273,30 @@ Core/Src/freertos.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/build.make CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/Core/Src/freertos.c.s
 .PHONY : Core/Src/freertos.c.s
 
+Core/Src/ge.obj: Core/Src/ge.c.obj
+.PHONY : Core/Src/ge.obj
+
+# target to build an object file
+Core/Src/ge.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/build.make CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/Core/Src/ge.c.obj
+.PHONY : Core/Src/ge.c.obj
+
+Core/Src/ge.i: Core/Src/ge.c.i
+.PHONY : Core/Src/ge.i
+
+# target to preprocess a source file
+Core/Src/ge.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/build.make CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/Core/Src/ge.c.i
+.PHONY : Core/Src/ge.c.i
+
+Core/Src/ge.s: Core/Src/ge.c.s
+.PHONY : Core/Src/ge.s
+
+# target to generate assembly for a file
+Core/Src/ge.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/build.make CMakeFiles/Exp-daolibai-stm32f407igh-can.elf.dir/Core/Src/ge.c.s
+.PHONY : Core/Src/ge.c.s
+
 Core/Src/gpio.obj: Core/Src/gpio.c.obj
 .PHONY : Core/Src/gpio.obj
 
@@ -1388,6 +1412,9 @@ help:
 	@echo "... Core/Src/freertos.obj"
 	@echo "... Core/Src/freertos.i"
 	@echo "... Core/Src/freertos.s"
+	@echo "... Core/Src/ge.obj"
+	@echo "... Core/Src/ge.i"
+	@echo "... Core/Src/ge.s"
 	@echo "... Core/Src/gpio.obj"
 	@echo "... Core/Src/gpio.i"
 	@echo "... Core/Src/gpio.s"
