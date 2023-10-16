@@ -122,4 +122,8 @@ void chan_axis(RemoteControl *rc)
     tmp = rc->c.x;
     rc->c.x = -rc->c.z;
     rc->c.z = tmp;
+
+		tmp = rc->center.x;
+		rc->center.x = -rc->center.z;
+		rc->center.z = tmp;
 }

@@ -32,8 +32,8 @@ double angle[3] = {};
 const int full_cir = 8192;
 int zero_angle[3] = {0};
 
-const double G1 = 2.0;
-const double G = 1;
+const double G1 = 1.8;
+const double G = 0.90;
 RemoteControl *rc;
 
 int main(void)
@@ -91,10 +91,13 @@ int main(void)
 				/**    moto_chassis[0].angle,*/
 				/**    moto_chassis[1].angle,*/
 				/**    moto_chassis[2].angle);*/
-				double a = (2 * M_PI + angle[0]+angle[1]+angle[2])/3;
-        rc->w1 = a;
-        rc->w2 = a;
-        rc->w3 = a;
+				/**double a = (2 * M_PI + angle[0]+angle[1]+angle[2])/3;*/
+        /**rc->w1 = a;*/
+        /**rc->w2 = a;*/
+        /**rc->w3 = a;*/
+        rc->w1 = angle[0];
+        rc->w2 = angle[1];
+        rc->w3 = angle[2];
         solution(rc);
 
         if (rc->error_flag)
@@ -119,16 +122,20 @@ int main(void)
         /**double *F ;*/
         double F1[3];
         double *F;
-        Vec3d moto_rotevec[3] = { { 0, -1, 0 },
-                                  { -sin(M_PI / 3), cos(M_PI / 3), 0 },
-                                  { cos(M_PI / 6), sin(M_PI / 6), 0 } };
+        /**Vec3d moto_rotevec[3] = { { 0, -1, 0 },*/
+        /**                          { -sin(M_PI / 3), cos(M_PI / 3), 0 },*/
+        /**                          { cos(M_PI / 6), sin(M_PI / 6), 0 } };*/
+
+				Vec3d moto_rotevec[3] = { { 0, -1, 0 },
+																	{ 0, cos(M_PI / 3), sin(M_PI / 3) },
+																	{ 0, sin(M_PI / 6), -cos(M_PI / 6) } };
         Vec3d t_vec[3] = { 0 };
         Vec3d secarm_vec[3] = { 0 };
 
         /**cprintf(&huart1, "a : [%f %f %f]\n", rc->a.x,rc->a.y,rc->a.z);*/
         /**cprintf(&huart1, "b : [%f %f %f]\n", rc->b.x,rc->b.y,rc->b.z);*/
         /**cprintf(&huart1, "c : [%f %f %f]\n", rc->c.x,rc->c.y,rc->c.z);*/
-        chan_axis(rc);
+        /**chan_axis(rc);*/
         /**cprintf(&huart1, "a : [%f %f %f]\n", rc->a.x,rc->a.y,rc->a.z);*/
         /**cprintf(&huart1, "b : [%f %f %f]\n", rc->b.x,rc->b.y,rc->b.z);*/
         /**cprintf(&huart1, "c : [%f %f %f]\n", rc->c.x,rc->c.y,rc->c.z);*/
@@ -142,9 +149,12 @@ int main(void)
         /**cprintf(&huart1, "t2 : [%f %f %f]\n", t_vex[1].x,t_vex[1].y,t_vex[1].z);*/
         /**cprintf(&huart1, "t3 : [%f %f %f]\n", t_vex[2].x,t_vex[2].y,t_vex[2].z);*/
 
-				secarm_vec[0] 
-				secarm_vec[1]
-				secarm_vec[2]
+				sub(&rc->center,&rc->a,&secarm_vec[0]);
+				sub(&rc->center,&rc->b,&secarm_vec[1]);
+				sub(&rc->center,&rc->c,&secarm_vec[2]);
+        mul(1.0 / norm(&secarm_vec[0]), &secarm_vec[0], &secarm_vec[0]);
+        mul(1.0 / norm(&secarm_vec[1]), &secarm_vec[1], &secarm_vec[1]);
+        mul(1.0 / norm(&secarm_vec[2]), &secarm_vec[2], &secarm_vec[2]);
 
         // all in one gravity compensation ----------------
 						/**cprintf(*/
@@ -153,20 +163,21 @@ int main(void)
 						/**    -rc->center.z,*/
 						/**    rc->center.y,*/
 						/**    rc->center.x);*/
-        g_matrix[0][0] = t_vec[0].x;
-        g_matrix[0][1] = t_vec[1].x;
-        g_matrix[0][2] = t_vec[2].x;
-        g_matrix[0][3] = 0;
+        g_matrix[0][0] = secarm_vec[0].x;
+        g_matrix[0][1] = secarm_vec[1].x;
+        g_matrix[0][2] = secarm_vec[2].x;
+        g_matrix[0][3] = -0.12;
 
-        g_matrix[1][0] = t_vec[0].y;
-        g_matrix[1][1] = t_vec[1].y;
-        g_matrix[1][2] = t_vec[2].y;
+
+        g_matrix[1][0] = secarm_vec[0].y;
+        g_matrix[1][1] = secarm_vec[1].y;
+        g_matrix[1][2] = secarm_vec[2].y;
         g_matrix[1][3] = 0;
 
-        g_matrix[2][0] = t_vec[0].z;
-        g_matrix[2][1] = t_vec[1].z;
-        g_matrix[2][2] = t_vec[2].z;
-				g_matrix[2][3] = G;
+        g_matrix[2][0] = secarm_vec[0].z;
+        g_matrix[2][1] = secarm_vec[1].z;
+        g_matrix[2][2] = secarm_vec[2].z;
+        g_matrix[2][3] = G;
 				/**printf("--------------\n");*/
 				/**for(int i = 0;i < 3;++i){*/
 				/**    cprintf(&huart1,"| ");*/
@@ -179,16 +190,23 @@ int main(void)
         F = gaussian_elimination(g_matrix, 3, 4);
         // ------------------------------------------------------
 
-        F1[0] = G1 * cos(M_PI - angle[0]);
-        F1[1] = G1 * cos(M_PI - angle[1]);
-        F1[2] = G1 * cos(M_PI - angle[2]);
-
 				Vec3d f = {F[0],F[1],F[2]};
+				f.x *= dot(&secarm_vec[0],&t_vec[0]);
+				f.y *= dot(&secarm_vec[1],&t_vec[1]);
+				f.z *= dot(&secarm_vec[2],&t_vec[2]);
+
+				Vec3d g = {0,0,G1};
+        F1[0] = dot(&g,&t_vec[0]);
+        F1[1] = dot(&g,&t_vec[1]);
+        F1[2] = dot(&g,&t_vec[2]);
+
         /**mul(1.0 / norm(&f), &f, &f);*/
 
-				cprintf(&huart1,"solution : [%f %f %f]\n",f.z,f.y,f.z);
-				double k = 9000;
-				set_moto_current(&hcan1, (F1[0] * 1000) + (f.x * k), (F1[1] * 1000) +(f.y * k) , (F1[2] * 1000) + (f.z * k), 0);
+				cprintf(&huart1,"solution : [%f %f %f]\n",f.x,f.y,f.z);
+				double k =9250;
+				/**double k =0;*/
+				double k1 = 1150;
+				set_moto_current(&hcan1, (F1[0] * k1) + (f.x * k), (F1[1] * k1) +(f.y * k) , (F1[2] * k1) + (f.z * k), 0);
 
         free(F);
         HAL_Delay(1);
