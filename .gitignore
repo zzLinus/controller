@@ -12,3 +12,6 @@
 *.scvd
 *.iex
 *.22394
+.cache/
+build/
+*.json
