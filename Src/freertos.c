@@ -143,16 +143,14 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of test */
-  osThreadDef(test, test_task, osPriorityNormal, 0, 128);
-  testHandle = osThreadCreate(osThread(test), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
     osThreadDef(led, led_RGB_flow_task, osPriorityNormal, 0, 256);
     led_RGB_flow_handle = osThreadCreate(osThread(led), NULL);
 
-		/**osThreadDef(ctrl, controller_task, osPriorityLow, 0, 256);*/
-		/**oled_handle = osThreadCreate(osThread(ctrl), NULL);*/
+		osThreadDef(ctrl, controller_task, osPriorityLow, 0, 1024);
+		oled_handle = osThreadCreate(osThread(ctrl), NULL);
 
     osThreadDef(USBTask, usb_task, osPriorityNormal, 0, 256);
     usb_task_handle = osThreadCreate(osThread(USBTask), NULL);

@@ -49,13 +49,17 @@ Src/rtc.c \
 Src/spi.c \
 Src/tim.c \
 Src/usart.c \
+Src/com.c \
 Src/KF.c \
+Src/ge.c \
 Src/UI.c \
 Src/usb_device.c \
 Src/usbd_conf.c \
 Src/usbd_desc.c \
 Src/stm32f4xx_it.c \
 Src/stm32f4xx_hal_msp.c \
+Src/controller.c \
+Src/vector.c \
 bsp/boards/bsp_adc.c \
 bsp/boards/bsp_buzzer.c \
 bsp/boards/bsp_can.c \
@@ -250,7 +254,7 @@ LDSCRIPT = STM32F407IGHx_FLASH.ld
 # libraries
 LIBS = -lc -lm -lnosys
 LIBDIR = 
-LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) -L$(WORK_DIR)/components/algorithm -lahrs $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
+LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) -L$(WORK_DIR)/components/algorithm -lahrs $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections -u_printf_float
 
 # default action: build all
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin

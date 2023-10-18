@@ -138,11 +138,12 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
-    can_filter_init();
     delay_init();
-    cali_param_init();
-    remote_control_init();
     usart1_tx_dma_init();
+		HAL_CAN_Start(&hcan1);
+		my_can_filter_init_recv_all(&hcan1);
+		HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
