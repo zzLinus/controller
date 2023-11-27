@@ -8,7 +8,7 @@
 /// to use, copy, modify, merge, publish, distribute, sublicense,and/or sell
 /// copies of the Software, and to permit persons to whom the Software is furnished
 /// to do so,subject to the following conditions:
-l//
+///
 /// The above copyright notice and this permission notice shall be included in
 /// all copies or substantial portions of the Software.
 ///
@@ -23,12 +23,15 @@ l//
 
 #include "can.h"
 #include "bsp_can.h"
-#include "stdio.h"
-#include "main.h"
+#include "com.h"
+#include "usart.h"
 
-// list of 4, store the information (in structure 'moto_measure_t') of 4 motors respectively
-rc_moto_measure_t moto_chassis[4] = {0};
-uint8_t Rx_BUF[8];
+#define printf(...) cprintf(&huart1,__VA_ARGS__)
+
+
+Odrive_motor_measure motor[3] = {0};
+int can_message_count = 0;
+
 
 /*******************************************************************************************
   * @Func		my_can_filter_init
@@ -40,7 +43,7 @@ uint8_t Rx_BUF[8];
 void my_can_filter_init_recv_all(CAN_HandleTypeDef* _hcan)
 {
 	//can1 &can2 use same filter config
-	CAN_FilterTypeDef	CAN_FilterConfigStructure;
+	CAN_FilterTypeDef		CAN_FilterConfigStructure;
 
 //	CAN_FilterConfigStructure.FilterNumber = 0;
 	CAN_FilterConfigStructure.FilterMode = CAN_FILTERMODE_IDMASK;
@@ -49,7 +52,7 @@ void my_can_filter_init_recv_all(CAN_HandleTypeDef* _hcan)
 	CAN_FilterConfigStructure.FilterIdLow = 0x0000;
 	CAN_FilterConfigStructure.FilterMaskIdHigh = 0x0000;
 	CAN_FilterConfigStructure.FilterMaskIdLow = 0x0000;
-	CAN_FilterConfigStructure.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+	CAN_FilterConfigStructure.FilterFIFOAssignment = CAN_FilterFIFO0;
 	CAN_FilterConfigStructure.FilterBank = 14;//can1(0-13)和can2(14-27)分别得到一半的filter
 	CAN_FilterConfigStructure.FilterActivation = ENABLE;
 
@@ -59,27 +62,6 @@ void my_can_filter_init_recv_all(CAN_HandleTypeDef* _hcan)
 	}
 }
 
-void my_can_filter_init_recv_all_can2(CAN_HandleTypeDef* _hcan)
-{
-    //can1 &can2 use same filter config
-    CAN_FilterTypeDef	CAN_FilterConfigStructure;
-
-//	CAN_FilterConfigStructure.FilterNumber = 0;
-    CAN_FilterConfigStructure.FilterMode = CAN_FILTERMODE_IDMASK;
-    CAN_FilterConfigStructure.FilterScale = CAN_FILTERSCALE_32BIT;
-    CAN_FilterConfigStructure.FilterIdHigh = 0x0000;
-    CAN_FilterConfigStructure.FilterIdLow = 0x0000;
-    CAN_FilterConfigStructure.FilterMaskIdHigh = 0x0000;
-    CAN_FilterConfigStructure.FilterMaskIdLow = 0x0000;
-    CAN_FilterConfigStructure.FilterFIFOAssignment = CAN_FILTER_FIFO1;
-    CAN_FilterConfigStructure.FilterBank = 14;//can1(0-13)和can2(14-27)分别得到一半的filter
-    CAN_FilterConfigStructure.FilterActivation = ENABLE;
-
-    if(HAL_CAN_ConfigFilter(_hcan, &CAN_FilterConfigStructure) != HAL_OK)
-    {
-//		while(1); //show error!
-    }
-}
 uint32_t FlashTimer;
 /*******************************************************************************************
   * @Func			void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* _hcan)
@@ -91,129 +73,159 @@ uint32_t FlashTimer;
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan)
 {
 	CAN_RxHeaderTypeDef		Rx1Message;
-	static uint8_t Data[8];
+	uint8_t Data[8];
 	uint8_t MotorID;
 	
-	Rx1Message.StdId = 0x205;  // 0x200 + CANID    0x200?
-	Rx1Message.ExtId = 0;  // CAN_ID_STD, ExtId is invalid
+	Rx1Message.StdId = 0x201;  
+	Rx1Message.ExtId = 0;  
 	Rx1Message.IDE = CAN_ID_STD;
 	Rx1Message.RTR = CAN_RTR_DATA;
 	Rx1Message.DLC = 0x08;
 
-	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &Rx1Message, Data);
-	
-	switch(Rx1Message.StdId)
+	if(HAL_GetTick() - FlashTimer>500)
 	{
-		case CAN_2006Moto1_ID: MotorID=0; break;
-		case CAN_2006Moto2_ID: MotorID=1; break;
-		case CAN_2006Moto3_ID: MotorID=2; break;
-		case CAN_2006Moto4_ID: MotorID=3; break;
-
-        case 0x110:
-
-            break;
+		HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);
+		FlashTimer = HAL_GetTick();
 	}
-		
-	
-//	get_moto_measure(&moto_chassis[MotorID], Data);
-	/* get_moto_measure (1 motor) */
-	moto_chassis[MotorID].last_angle = moto_chassis[MotorID].angle;
-	moto_chassis[MotorID].angle = (uint16_t)(Data[0]<<8 | Data[1]) ;
-	moto_chassis[MotorID].speed_rpm  = (int16_t)(Data[2]<<8 | Data[3]);
-	moto_chassis[MotorID].real_current = (Data[4]<<8 | Data[5])*5.f/16384.f;
-	moto_chassis[MotorID].hall = Data[6];
-	if(moto_chassis[MotorID].angle - moto_chassis[MotorID].last_angle > 4096)
-		moto_chassis[MotorID].round_cnt --;
-	else if (moto_chassis[MotorID].angle - moto_chassis[MotorID].last_angle < -4096)
-		moto_chassis[MotorID].round_cnt ++;
-	moto_chassis[MotorID].total_angle = moto_chassis[MotorID].round_cnt * 8192 + moto_chassis[MotorID].angle - moto_chassis[MotorID].offset_angle;
-	
-	
+
+	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &Rx1Message, Data);
+
+	//输出CAN接收到的所有信息
+	// if(Rx1Message.StdId == (0x01<<5 | HEARTBEAT_MESSAGE_CMDID))
+	// {
+	// printf("ID:%x,count=%d \t\tData:%x, %x, %x, %x, %x, %x, %x, %x\n", Rx1Message.StdId, can_message_count, Data[0], 
+	// 				Data[1], Data[2], Data[3], Data[4], Data[5], Data[6], Data[7]);
+	// can_message_count++;
+	// }
+
+
+	/*接收CAN发送的数据 & 向电机发送目标扭矩*/
+	switch (Rx1Message.StdId&0x1F)
+	{
+	case GET_ENCODER_COUNT_CMDID:
+		motor[Rx1Message.StdId>>5].encoder = Data[5]<<8 | Data[4];
+		Odrv_set_motor_torque(&hcan1, Rx1Message.StdId>>5, motor[Rx1Message.StdId>>5].traget_torque);
+		break;
+	case HEARTBEAT_MESSAGE_CMDID:
+		motor[Rx1Message.StdId>>5].axis_err = Data[3]<<24 | Data[2]<<16 | Data[1]<<8 | Data[0];
+		motor[Rx1Message.StdId>>5].axis_current_stage = Data[4];
+		motor[Rx1Message.StdId>>5].motor_err_flag = Data[5];
+		motor[Rx1Message.StdId>>5].encoder_err_flag = Data[6];
+
+		/*在编码器错误的情况下尝试重新进闭环*/
+		for(int i=0; i<3; i++)
+		{
+			if((motor[i].encoder_err_flag == 1))
+			{
+			//清除错误
+			printf("encoder failed, id=%d!\n", i);
+			Odrv_Clear_err(&hcan1, i);
+			motor[i].state_resrt_count = 0;
+			}
+			else if((motor[i].axis_current_stage != 8) && (motor[i].axis_current_stage != 0) && motor[i].state_resrt_count <= 100)
+			{
+			//尝试重新进闭环
+			printf("stage_err, id=%d, state=%d!\n", i, motor[i].axis_current_stage);
+			Odrv_set_axis_state(&hcan1, i, 8);
+			motor[i].state_resrt_count++;
+			}
+		}
+		break;
+	}
 	/*#### add enable can it again to solve can receive only one ID problem!!!####**/
 	__HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
-
-
 }
 
 
-/*******************************************************************************************
-  * @Func			void get_moto_measure(moto_measure_t *ptr, CAN_HandleTypeDef* hcan)
-  * @Brief    接收3508电机通过CAN发过来的信息
-  * @Param		
-  * @Retval		None
-  * @Date     2015/11/24
- *******************************************************************************************/
-//void get_moto_measure(moto_measure_t *ptr, uint8_t Data[])
-//{
-//	ptr->last_angle = ptr->angle;
-//	ptr->angle = (uint16_t)(Data[0]<<8 | Data[1]) ;
-//	ptr->speed_rpm  = (int16_t)(Data[2]<<8 | Data[3]);
-//	ptr->real_current = (Data[4]<<8 | Data[5])*5.f/16384.f;
-//	ptr->hall = Data[6];
-//	
-//	if(ptr->angle - ptr->last_angle > 4096)
-//		ptr->round_cnt --;
-//	else if (ptr->angle - ptr->last_angle < -4096)
-//		ptr->round_cnt ++;
-//	ptr->total_angle = ptr->round_cnt * 8192 + ptr->angle - ptr->offset_angle;
-//}
-
-
-/*this function should be called after system+can init */
-//void get_moto_offset(moto_measure_t *ptr, CAN_HandleTypeDef* hcan)
-//{
-//	ptr->angle = (uint16_t)(hcan->pRxMsg->Data[0]<<8 | hcan->pRxMsg->Data[1]) ;
-//	ptr->offset_angle = ptr->angle;
-//}
-
-
-#define ABS(x)	( (x>0) ? (x) : (-x) )
-/**
-*@bref 电机上电角度=0， 之后用这个函数更新3510电机的相对开机后（为0）的相对角度。
-	*/
-//void get_total_angle(moto_measure_t *p){
-//	
-//	int res1, res2, delta;
-//	if(p->angle < p->last_angle){			//可能的情况
-//		res1 = p->angle + 8192 - p->last_angle;	//正转，delta=+
-//		res2 = p->angle - p->last_angle;				//反转	delta=-
-//	}else{	//angle > last
-//		res1 = p->angle - 8192 - p->last_angle ;//反转	delta -
-//		res2 = p->angle - p->last_angle;				//正转	delta +
-//	}
-//	//不管正反转，肯定是转的角度小的那个是真的
-//	if(ABS(res1)<ABS(res2))
-//		delta = res1;
-//	else
-//		delta = res2;
-
-//	p->total_angle += delta;
-//	p->last_angle = p->angle;
-//}
-
-
-void set_moto_current(CAN_HandleTypeDef* hcan, s16 iq1, s16 iq2, s16 iq3, s16 iq4)
+/*向Odrive发送CAN信息*/
+uint8_t Odrv_CAN_Send_Msg(CAN_HandleTypeDef *hcan,uint16_t StdID,uint8_t *msg,uint8_t len,uint8_t Frame_type)
 {
-	CAN_TxHeaderTypeDef CanTx;
-	uint8_t Data[8];
-	uint32_t Mailbox=0;
-	
-	CanTx.StdId = 0x200;  // 0x200
-	CanTx.ExtId = 0;  // CAN_ID_STD, ExtId is invalid
-	CanTx.IDE = CAN_ID_STD;
-	CanTx.RTR = CAN_RTR_DATA;
-	CanTx.DLC = 0x08;
-	CanTx.TransmitGlobalTime = DISABLE;
-	
-	Data[0] = (iq1 >> 8);
-	Data[1] = iq1;
-	Data[2] = (iq2 >> 8);
-	Data[3] = iq2;
-	Data[4] = iq3 >> 8;
-	Data[5] = iq3;
-	Data[6] = iq4 >> 8;
-	Data[7] = iq4;
-	
-	HAL_CAN_AddTxMessage(hcan, &CanTx, Data, &Mailbox);
-}	
+	CAN_TxHeaderTypeDef TxHeader;
+    uint8_t index=0;
+    uint32_t TxMailbox;   //邮箱
+    uint8_t send_buf[8] = {0};
+    TxHeader.StdId=StdID;        //标准标识符
+    TxHeader.ExtId=0;        //扩展标识符(29位)
+    TxHeader.IDE=CAN_ID_STD;    //使用标准帧
+    TxHeader.RTR = Frame_type != CAN_RTR_REMOTE ? CAN_RTR_DATA : CAN_RTR_REMOTE;  //数据帧为发送数据，远程帧为请求返回数据
+    //TxHeader.RTR = CAN_RTR_DATA;
+    TxHeader.DLC=len;
+    /*****填充消息******/
+    for ( index = 0; index < len; index++) {
+            send_buf[index] = msg[index];
+    }
+    /*****发送消息*****/
+	// printf("SENT ID:%x, \t\tData:%x, %x, %x, %x, %x, %x, %x, %x\n", TxHeader.StdId, send_buf[0],
+	// 		send_buf[1], send_buf[2], send_buf[3], send_buf[4], send_buf[5], send_buf[6], send_buf[7]);
+    if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, send_buf, &TxMailbox) != HAL_OK)//发送
+    {
+        return 1;
+    }
+    return 0;
+}
 
+/*设置电机扭矩*/
+void Odrv_set_motor_torque(CAN_HandleTypeDef* hcan, int axis_id, float torque_set)
+{
+	uint8_t can_msg[8] = {0};
+	unsigned int* float_bit_data = (unsigned int*)(&torque_set);
+	can_msg[3] = (*float_bit_data>>24)&0xff;
+	can_msg[2] = (*float_bit_data>>16)&0xff;
+	can_msg[1] = (*float_bit_data>>8)&0xff;
+	can_msg[0] = (*float_bit_data)&0xff;
+	//printf("%d, %d, %d, %d\n", can_msg[0], can_msg[1], can_msg[2], can_msg[3]);
+	Odrv_CAN_Send_Msg(&hcan, axis_id<<5 | 0x00E, can_msg, 8, CAN_RTR_DATA);
+}
+
+/*设置电机位置*/
+void Odrv_set_motor_position(CAN_HandleTypeDef* hcan, int axis_id, float position_set, int16_t vel_lim, int16_t tor_lim)
+{
+	uint8_t can_msg[8] = {0};
+	unsigned int* float_bit_data = (unsigned int*)(&position_set);
+	can_msg[3] = (*float_bit_data>>24)&0xff;
+	can_msg[2] = (*float_bit_data>>16)&0xff;
+	can_msg[1] = (*float_bit_data>>8)&0xff;
+	can_msg[0] = (*float_bit_data)&0xff;
+	can_msg[5] = (vel_lim<<8)&0xff;
+	can_msg[6] = (vel_lim)&0xff;
+	can_msg[8] = (tor_lim<<8)&0xff;
+	can_msg[7] = (tor_lim)&0xff;
+	//printf("%d, %d, %d, %d\n", can_msg[0], can_msg[1], can_msg[2], can_msg[3]);
+	Odrv_CAN_Send_Msg(&hcan, axis_id<<5 | 0x00C, can_msg, 8, CAN_RTR_DATA);
+}
+
+/*设置控制模式*/
+void Odrv_set_motor_ControlMode(CAN_HandleTypeDef* hcan, int axis_id, int32_t control_mode, int32_t input_mode)
+{
+	uint8_t can_msg[8] = {0};
+
+	can_msg[3] = (control_mode<<24)&0xff;
+	can_msg[2] = (control_mode<<16)&0xff;
+	can_msg[1] = (control_mode<<8)&0xff;
+	can_msg[0] = (control_mode)&0xff;
+	can_msg[7] = (input_mode<<24)&0xff;
+	can_msg[6] = (input_mode<<16)&0xff;
+	can_msg[5] = (input_mode<<8)&0xff;
+	can_msg[4] = (input_mode)&0xff;
+	//printf("%d, %d, %d, %d\n", can_msg[0], can_msg[1], can_msg[2], can_msg[3]);
+	Odrv_CAN_Send_Msg(&hcan, axis_id<<5 | 0x00B, can_msg, 8, CAN_RTR_DATA);
+}
+
+/*清除错误*/
+void Odrv_Clear_err(CAN_HandleTypeDef* hcan, int axis_id)
+{
+	uint8_t can_msg[8] = {0};
+	Odrv_CAN_Send_Msg(&hcan, axis_id<<5 | 0x018, can_msg, 8, CAN_RTR_REMOTE);
+}
+
+/*设置控制状态*/
+void Odrv_set_axis_state(CAN_HandleTypeDef* hcan, int axis_id, int32_t axis_state)
+{
+	uint8_t can_msg[8] = {0};
+
+	can_msg[3] = (axis_state<<24)&0xff;
+	can_msg[2] = (axis_state<<16)&0xff;
+	can_msg[1] = (axis_state<<8)&0xff;
+	can_msg[0] = (axis_state)&0xff;
+	Odrv_CAN_Send_Msg(&hcan, axis_id<<5 | 0x007, can_msg, 8, CAN_RTR_DATA);
+}

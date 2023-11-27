@@ -32,11 +32,11 @@
 
 const double k = 200.0;
 double angle[3] = {};
-const int full_cir = 8192;
+const int full_cir = 16384;
 int zero_angle[3] = { 0 };
 
-const double G1 = 1.8;
-const double G = 0.90;
+const double G1 = .8;
+const double G = 2.60;
 RemoteControl *rc;
 
 /**
@@ -57,16 +57,17 @@ void controller_task(void const *argument)  // !!!!!该任务已关闭!!!!!
     {
         for (int j = 0; j < 3; ++j)
         {
-            zero_angle[j] = ((full_cir >> 1) + moto_chassis[j].angle) % full_cir;
+            zero_angle[j] = ((full_cir >> 1) + motor[j].encoder) % full_cir;
         }
         HAL_Delay(1);
     }
 
+		float x = 3.14*0.5;
     while (1)
     {
         for (int i = 0; i < 3; i++)
         {
-            angle[i] = ((double)(moto_chassis[i].angle - zero_angle[i] ) / full_cir + (25.64 / 360)) * 2.0 * M_PI;
+            angle[i] = ((double)(motor[i].encoder - zero_angle[i] ) / full_cir + ((360-329.0023) / 360)) * 2.0 * M_PI;
 						/**cprintf(&huart1,"motoangle : %d",moto_chassis[i].angle);*/
             /**angle[i] = ((double)(zero_angle[i] - moto_chassis[i].angle) / full_cir) * 2.0 * M_PI;*/
         }
@@ -96,15 +97,15 @@ void controller_task(void const *argument)  // !!!!!该任务已关闭!!!!!
         }
         else
         {
-            /**cprintf(*/
-            /**    &huart1,*/
-            /**    "pos: (%lf, %lf, %lf) angle (%lf %lf %lf)\n",*/
-            /**    rc->center.x,*/
-            /**    rc->center.y,*/
-            /**    rc->center.z,*/
-            /**    angle[0],*/
-            /**    angle[1],*/
-            /**    angle[2]);*/
+						/**cprintf(*/
+						/**    &huart1,*/
+						/**    "pos: (%lf, %lf, %lf) angle (%lf %lf %lf)\n",*/
+						/**    rc->center.x,*/
+						/**    rc->center.y,*/
+						/**    rc->center.z,*/
+						/**    angle[0],*/
+						/**    angle[1],*/
+						/**    angle[2]);*/
         }
 
         double g_matrix[3][4] = {};
@@ -155,7 +156,7 @@ void controller_task(void const *argument)  // !!!!!该任务已关闭!!!!!
 				g_matrix[0][0] = secarm_vec[0].x;
 				g_matrix[0][1] = secarm_vec[1].x;
 				g_matrix[0][2] = secarm_vec[2].x;
-				g_matrix[0][3] = -0.12;
+				g_matrix[0][3] = 0;
 
 
 				g_matrix[1][0] = secarm_vec[0].y;
@@ -189,11 +190,23 @@ void controller_task(void const *argument)  // !!!!!该任务已关闭!!!!!
 				F1[1] = rc_dot(&g,&t_vec[1]);
 				F1[2] = rc_dot(&g,&t_vec[2]);
 
-				cprintf(&huart1,"solution : [%f %f %f]\n",f.x,f.y,f.z);
-				double k =9550;
-				/**double k =0;*/
-				double k1 = 1150;
-				set_moto_current(&hcan1, (F1[0] * k1) + (f.x * k), (F1[1] * k1) +(f.y * k) , (F1[2] * k1) + (f.z * k), 0);
+				double k = 9550;
+				double k1 = 0;
+				double kp2 = 2;
+
+				/**cprintf(&huart1,"solution : [%f %f %f]\n",f.x,f.y,f.z);*/
+
+				cprintf(&huart1,"part 1 torque : %lf %lf %lf\n",f.x*kp2,f.y*kp2,f.z*kp2);
+				motor[0].traget_torque = (F1[0]*2) + (f.x*kp2);
+				motor[1].traget_torque = (F1[1]*2) + (f.y*kp2);
+				motor[2].traget_torque = (F1[2]*2) + (f.z*kp2);
+				for(int i=0; i<3; i++)
+				{
+				/**motor[i].traget_torque = sin(x)*4;*/
+						if(motor[i].axis_current_stage != 8)
+								cprintf(&huart1,"error motor id : %d\n",i);
+				}
+				x += 0.01;
 				free(F);
 				HAL_Delay(1);
     }

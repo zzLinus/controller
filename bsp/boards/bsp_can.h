@@ -47,37 +47,12 @@ typedef volatile int8_t 	vs8;
 typedef volatile int16_t 	vs16;
 typedef volatile int32_t	vs32;
 
-
-typedef union{
-	s8 		s8_fmt[8];	//for angle and omega
-	u8 		u8_fmt[8];	//for angle and omega
-	char 	ch_fmt[8];	//
-	s16		s16_fmt[4];
-	u16		u16_fmt[4];
-	s32 	s32_fmt[2];
-	u32 	u32_fmt[2];
-	float 	f32_fmt[2];
-	double 	d64_fmt;
-}data_convert_ut;	//for diaobi gyro
-
-
-
-
-/*CAN发送或是接收的ID*/
-typedef enum
-{
-	CAN_2006Moto_ALL_ID = 0x200,
-	CAN_2006Moto1_ID = 0x201,
-	CAN_2006Moto2_ID = 0x202,
-	CAN_2006Moto3_ID = 0x203,
-	CAN_2006Moto4_ID = 0x204,
-	CAN_6020Moto1_ID = 0x205,
-    CAN_6020Moto2_ID = 0x206
-}CAN_Message_ID;
-
+#define HEARTBEAT_MESSAGE_CMDID 0x001 
+#define GET_ENCODER_COUNT_CMDID 0X00A
+#define GET_VBUS_VOLTAGE_CMDID  0x017
 
 #define FILTER_BUF_LEN		5
-/*接收到的云台电机的参数结构体*/
+/*?????????????????????*/
 typedef struct{
 	int16_t	 	speed_rpm;
   float  	real_current;
@@ -92,19 +67,45 @@ typedef struct{
 	u16			angle_buf[FILTER_BUF_LEN];
 	u16			fited_angle;
 	u32			msg_cnt;
-}rc_moto_measure_t;
+}moto_measure_t;
 
 
-extern rc_moto_measure_t  moto_chassis[];
+typedef struct
+{
+	int16_t encoder;
+	int16_t speed;
+	float real_current;
+	float vbus_vlotage;
+	float traget_torque;
+	/*×´Ì¬²âÊÔ*/
+	int32_t axis_err;
+	int8_t axis_current_stage;
+	int8_t motor_err_flag;
+	int8_t encoder_err_flag;
+	int8_t state_resrt_count;
+} Odrive_motor_measure;
 
+
+
+extern moto_measure_t  moto_chassis[];
+extern Odrive_motor_measure motor[];
+
+#define LED_Pin GPIO_PIN_10
+#define LED_GPIO_Port GPIOH
 
 void my_can_filter_init(CAN_HandleTypeDef* hcan);
 void my_can_filter_init_recv_all(CAN_HandleTypeDef* _hcan);
 void can_filter_recv_special(CAN_HandleTypeDef* hcan, uint8_t filter_number, uint16_t filtered_id);
-void get_moto_measure(rc_moto_measure_t *ptr, uint8_t Data[]);
+void get_moto_measure(moto_measure_t *ptr, uint8_t Data[]);
 void can_receive_onetime(CAN_HandleTypeDef* _hcan, int time);
 void set_moto_current(CAN_HandleTypeDef* hcan, s16 iq1, s16 iq2, s16 iq3, s16 iq4);
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan);
+uint8_t Odrv_CAN_Send_Msg(CAN_HandleTypeDef *hcan,uint16_t StdID,uint8_t *msg,uint8_t len,uint8_t Frame_type);
+void Odrv_set_motor_torque(CAN_HandleTypeDef* hcan, int axis_id, float torque_set);
+void Odrv_set_motor_position(CAN_HandleTypeDef* hcan, int axis_id, float position_set, int16_t vel_lim, int16_t tor_lim);
+void Odrv_set_motor_ControlMode(CAN_HandleTypeDef* hcan, int axis_id, int32_t control_mode, int32_t input_mode);
+void Odrv_Clear_err(CAN_HandleTypeDef* hcan, int axis_id);
+void Odrv_set_axis_state(CAN_HandleTypeDef* hcan, int axis_id, int32_t axis_state);
 
 #endif
 
